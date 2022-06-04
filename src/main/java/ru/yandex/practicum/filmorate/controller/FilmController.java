@@ -21,10 +21,13 @@ public class FilmController {
     public Film add(@Valid @RequestBody Film film) {
 
         //установить новый id для нового фильма
-        film.setId(IdSequence.getNewId());
+        film.setId(IdSequence.getNewFilmId());
 
-        //сохранить новый фильм и вернуть его
-        return films.put(film.getId(), film);
+        //сохранить новый фильм
+        films.put(film.getId(), film);
+
+        //и вернуть его
+        return films.get(film.getId());
     }
 
     @PutMapping
@@ -38,8 +41,11 @@ public class FilmController {
             throw new UnknownFilmException(String.format("Фильм с %d не найден!", film.getId()));
         }
 
-        //обновить фильм и вернуть его
-        return films.put(film.getId(), film);
+        //обновить фильм
+        films.put(film.getId(), film);
+
+        //и вернуть его
+        return films.get(film.getId());
     }
 
     @GetMapping

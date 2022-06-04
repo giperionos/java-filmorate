@@ -20,13 +20,16 @@ public class UserController {
     public User add(@Valid @RequestBody User user) {
 
         //установить новый id для нового пользователя
-        user.setId(IdSequence.getNewId());
+        user.setId(IdSequence.getNewUserId());
 
         //уточнить имя пользователя - если не задано, установить значением из login
         defineUserName(user);
 
-        //сохранить нового пользователя и вернуть его
-        return users.put(user.getId(), user);
+        //сохранить нового пользователя
+        users.put(user.getId(), user);
+
+        //и вернуть его
+        return users.get(user.getId());
     }
 
     @PutMapping
@@ -43,8 +46,11 @@ public class UserController {
         //уточнить имя пользователя - если не задано, установить значением из login
         defineUserName(user);
 
-        //обновить пользователя и вернуть его
-        return users.put(user.getId(), user);
+        //обновить пользователя
+        users.put(user.getId(), user);
+
+        //и вернуть его
+        return users.get(user.getId());
     }
 
     @GetMapping
