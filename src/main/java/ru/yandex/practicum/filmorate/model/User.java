@@ -1,12 +1,27 @@
 package ru.yandex.practicum.filmorate.model;
 
-import java.time.LocalDateTime;
+import lombok.Data;
+import ru.yandex.practicum.filmorate.validators.DateNotEarlier;
 
+import javax.validation.constraints.*;
+import java.time.LocalDate;
+
+@Data
 public class User {
 
-    private Integer id;
+    private Long id;
+
+    @NotNull(message = "Не указан email пользователя.")
+    @Email(message = "Не верно указан email пользователя.")
     private String email;
+
+    @NotBlank(message = "Не указан login.")
+    @Pattern(regexp = "^[^\\s]+$", message = "Указанный login содержит пробелы.")
     private String login;
+
+
     private String name;
-    private LocalDateTime birthday;
+
+    @Past(message = "Дата рождения должна быть в прошлом.")
+    private LocalDate birthday;
 }
