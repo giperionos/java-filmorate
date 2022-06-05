@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.validators;
 import javax.validation.Constraint;
 import javax.validation.Payload;
 import java.lang.annotation.*;
-import java.time.LocalDateTime;
 
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)

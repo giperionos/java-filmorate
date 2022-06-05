@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.Data;
-import ru.yandex.practicum.filmorate.validators.DateNotEarlier;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
