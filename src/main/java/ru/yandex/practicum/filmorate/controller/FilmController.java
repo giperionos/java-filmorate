@@ -1,8 +1,10 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.UnknownFilmException;
+import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.util.IdSequence;
 
@@ -26,14 +28,12 @@ public class FilmController {
 
         //установить новый id для нового фильма
         film.setId(IdSequence.getNewFilmId());
-        log.debug("Фильму присвоен id = " + film.getId());
 
         //сохранить новый фильм
         films.put(film.getId(), film);
-        log.debug("Фильм c id = " + film.getId() + " сохранен.");
 
         //и вернуть его
-        log.debug("Фильм: " + film + " передан клиенту.");
+        log.debug("Фильм: " + film + "сохранен и передан клиенту.");
         return films.get(film.getId());
     }
 
@@ -43,7 +43,6 @@ public class FilmController {
         log.debug("Пришел объект: " + film);
 
         //поискать фильм для обновления
-        log.debug("Поиск фильма с id = " + film.getId() + " в памяти приложения.");
         Film updatedFilm = films.get(film.getId());
 
         //если нет такого - ошибка
@@ -54,15 +53,26 @@ public class FilmController {
 
         //обновить фильм
         films.put(film.getId(), film);
-        log.debug("Фильм c id = " + film.getId() + " обновлен.");
 
         //и вернуть его
-        log.debug("Фильм: " + film + " передан клиенту.");
+        log.debug("Фильм: " + film + " обновлен и передан клиенту.");
         return films.get(film.getId());
     }
 
     @GetMapping
     public List<Film> getAll(){
         return new ArrayList<>(films.values());
+    }
+
+    @ExceptionHandler(UnknownFilmException.class)
+    public void handleUnknownFilmException(UnknownFilmException e) {
+        log.warn(e.getMessage());
+        throw e;
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public void handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        log.warn(e.getMessage());
+        throw new ValidationException(e.getMessage());
     }
 }

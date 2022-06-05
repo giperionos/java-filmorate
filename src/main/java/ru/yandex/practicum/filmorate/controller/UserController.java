@@ -1,8 +1,11 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exceptions.UnknownFilmException;
 import ru.yandex.practicum.filmorate.exceptions.UnknownUserException;
+import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.util.IdSequence;
 
@@ -25,17 +28,15 @@ public class UserController {
 
         //установить новый id для нового пользователя
         user.setId(IdSequence.getNewUserId());
-        log.debug("Пользователю присвоен id = " + user.getId());
 
         //уточнить имя пользователя - если не задано, установить значением из login
         defineUserName(user);
 
         //сохранить нового пользователя
         users.put(user.getId(), user);
-        log.debug("Пользователь c id = " + user.getId() + " сохранен.");
 
         //и вернуть его
-        log.debug("Пользователь: " + user + " передан клиенту.");
+        log.debug("Пользователь: " + user + "сохранен и передан клиенту.");
         return users.get(user.getId());
     }
 
@@ -45,7 +46,6 @@ public class UserController {
         log.debug("Пришел объект: " + user);
 
         //поискать пользователя для обновления
-        log.debug("Поиск пользователя с id = " + user.getId() + " в памяти приложения.");
         User updatedUser = users.get(user.getId());
 
         //если нет такого - ошибка
@@ -59,10 +59,9 @@ public class UserController {
 
         //обновить пользователя
         users.put(user.getId(), user);
-        log.debug("Пользователь c id = " + user.getId() + " обновлен.");
 
         //и вернуть его
-        log.debug("Пользователь: " + user + " передан клиенту.");
+        log.debug("Пользователь: " + user + "обновлен и передан клиенту.");
         return users.get(user.getId());
     }
 
@@ -73,11 +72,23 @@ public class UserController {
 
     //уточнить имя пользователя - если не задано, установить значением из login
     private void defineUserName(User user){
-        log.debug("Проверка имени пользователя с id = " + user.getId());
+        log.trace("Проверка имени пользователя с id = " + user.getId());
         if (user.getName().isEmpty() || user.getName().isBlank()) {
-            log.debug("У пользователя не задано имя.");
+            log.trace("У пользователя не задано имя.");
             user.setName(user.getLogin());
-            log.debug("Пользователю с id = " + user.getId() + " присвоено имя: " + user.getName());
+            log.trace("Пользователю с id = " + user.getId() + " присвоено имя: " + user.getName());
         }
+    }
+
+    @ExceptionHandler(UnknownUserException.class)
+    public void handleUnknownUserException(UnknownUserException e) {
+        log.warn(e.getMessage());
+        throw e;
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public void handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        log.warn(e.getMessage());
+        throw new ValidationException(e.getMessage());
     }
 }
