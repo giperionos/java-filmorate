@@ -1,9 +1,10 @@
 package ru.yandex.practicum.filmorate.validators;
 
+import ru.yandex.practicum.filmorate.config.Config;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 public class DateNotEarlierValidator implements ConstraintValidator<DateNotEarlier, LocalDate> {
 
@@ -16,7 +17,7 @@ public class DateNotEarlierValidator implements ConstraintValidator<DateNotEarli
 
     @Override
     public boolean isValid(LocalDate localDate, ConstraintValidatorContext constraintValidatorContext) {
-        return localDate.isAfter(LocalDate.parse(startDateString, DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        return localDate.isAfter(LocalDate.parse(startDateString, Config.normalDateFormatter).minusDays(1));
     }
 
 }
