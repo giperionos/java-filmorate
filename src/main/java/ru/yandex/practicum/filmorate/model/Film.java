@@ -4,7 +4,6 @@ import lombok.*;
 import ru.yandex.practicum.filmorate.validators.DateNotEarlier;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
@@ -13,10 +12,15 @@ import java.time.LocalDate;
 @Setter
 @EqualsAndHashCode
 @ToString
-@AllArgsConstructor
-public class Film {
+public class Film extends Entity {
 
-    private Long id;
+    public Film(Long id, String name, String description, LocalDate releaseDate, Integer duration) {
+        super(id);
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+    }
 
     @NotBlank(message = "Название фильма не должно быть пустым.")
     private String name;
@@ -29,4 +33,9 @@ public class Film {
 
     @Positive(message = "Продолжительность фильма должна быть положительной.")
     private Integer duration;
+
+    @Override
+    public EntityType getEntityName(){
+        return EntityType.FILM;
+    }
 }

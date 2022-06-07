@@ -9,10 +9,17 @@ import java.time.LocalDate;
 @Setter
 @EqualsAndHashCode
 @ToString
-@AllArgsConstructor
-public class User {
+public class User extends Entity {
 
-    private Long id;
+    public User(Long id, String email, String login, String name, LocalDate birthday) {
+        super(id);
+        this.email = email;
+        this.login = login;
+        this.name = name;
+        this.birthday = birthday;
+
+        defineName();
+    }
 
     @NotNull(message = "Не указан email пользователя.")
     @Email(message = "Указанный email пользователя не сооветствует формату email.")
@@ -26,4 +33,15 @@ public class User {
 
     @Past(message = "Дата рождения пользователя должна быть в прошлом.")
     private LocalDate birthday;
+
+    @Override
+    public EntityType getEntityName(){
+        return EntityType.USER;
+    }
+
+    private void defineName(){
+        if (this.getName().isEmpty() || this.getName().isBlank()) {
+            this.setName(this.getLogin());
+        }
+    }
 }
