@@ -34,11 +34,6 @@ public class User extends Entity {
     @Past(message = "Дата рождения пользователя должна быть в прошлом.")
     private LocalDate birthday;
 
-    @Override
-    public EntityType getEntityName(){
-        return EntityType.USER;
-    }
-
     private void defineName(){
         if (this.getName().isEmpty() || this.getName().isBlank()) {
             this.setName(this.getLogin());

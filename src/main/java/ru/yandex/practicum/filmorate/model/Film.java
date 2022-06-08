@@ -33,9 +33,4 @@ public class Film extends Entity {
 
     @Positive(message = "Продолжительность фильма должна быть положительной.")
     private Integer duration;
-
-    @Override
-    public EntityType getEntityName(){
-        return EntityType.FILM;
-    }
 }

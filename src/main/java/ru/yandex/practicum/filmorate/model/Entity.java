@@ -9,8 +9,4 @@ import lombok.Setter;
 @AllArgsConstructor
 public class Entity {
     protected Long id;
-
-    public EntityType getEntityName(){
-        return EntityType.COMMON;
-    }
 }
