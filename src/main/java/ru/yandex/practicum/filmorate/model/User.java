@@ -4,6 +4,8 @@ import lombok.*;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -17,7 +19,7 @@ public class User extends Entity {
         this.login = login;
         this.name = name;
         this.birthday = birthday;
-
+        this.friends = new HashSet<>();
         defineName();
     }
 
@@ -33,6 +35,8 @@ public class User extends Entity {
 
     @Past(message = "Дата рождения пользователя должна быть в прошлом.")
     private LocalDate birthday;
+
+    private Set<Long> friends;
 
     private void defineName(){
         if (this.getName().isEmpty() || this.getName().isBlank()) {
