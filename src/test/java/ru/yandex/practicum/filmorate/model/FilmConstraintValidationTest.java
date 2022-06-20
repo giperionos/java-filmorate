@@ -3,7 +3,8 @@ package ru.yandex.practicum.filmorate.model;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.config.Config;
+import org.springframework.beans.factory.annotation.Autowired;
+import ru.yandex.practicum.filmorate.config.FilmorateConfig;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -30,7 +31,7 @@ class FilmConstraintValidationTest {
 
     @BeforeEach
     public void beforeEach(){
-        film = new Film(null, "Matrix", "Super-Mega Film", LocalDate.parse("14.10.1999", Config.normalDateFormatter), 136);
+        film = new Film(null, "Matrix", "Super-Mega Film", LocalDate.parse("14.10.1999", FilmorateConfig.normalDateFormatter), 136);
     }
 
     //Test Name
@@ -119,7 +120,7 @@ class FilmConstraintValidationTest {
     @Test
     public void shouldExistValidationErrorsWhenReleaseDateEarlierThen28121895(){
 
-        film.setReleaseDate(LocalDate.parse("27.12.1895", Config.normalDateFormatter));
+        film.setReleaseDate(LocalDate.parse("27.12.1895", FilmorateConfig.normalDateFormatter));
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
 
         assertFalse(violations.isEmpty(), "Валидация не содержит ошибки, которые ожидались: " + (violations.isEmpty() ? "" : violations.iterator().next().getMessage()));
@@ -129,7 +130,7 @@ class FilmConstraintValidationTest {
     @Test
     public void shouldBeEmptyValidationErrorsWhenReleaseDateEquals28121895(){
 
-        film.setReleaseDate(LocalDate.parse("28.12.1895", Config.normalDateFormatter));
+        film.setReleaseDate(LocalDate.parse("28.12.1895", FilmorateConfig.normalDateFormatter));
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
 
         assertTrue(violations.isEmpty(), "Валидация содержит ошибки, которые не ожидались: " + (violations.isEmpty() ? "" : violations.iterator().next().getMessage()));

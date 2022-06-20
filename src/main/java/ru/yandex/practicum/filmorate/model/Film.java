@@ -7,6 +7,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -20,6 +22,7 @@ public class Film extends Entity {
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
+        this.likes = new HashSet<>();
     }
 
     @NotBlank(message = "Название фильма не должно быть пустым.")
@@ -33,4 +36,6 @@ public class Film extends Entity {
 
     @Positive(message = "Продолжительность фильма должна быть положительной.")
     private Integer duration;
+
+    private Set<Long> likes;
 }

@@ -3,7 +3,8 @@ package ru.yandex.practicum.filmorate.model;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.config.Config;
+import org.springframework.beans.factory.annotation.Autowired;
+import ru.yandex.practicum.filmorate.config.FilmorateConfig;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -17,6 +18,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class UserConstraintValidationTest {
 
+    @Autowired
+    private FilmorateConfig properties;
+
     private static Validator validator;
 
     private User user;
@@ -29,7 +33,7 @@ class UserConstraintValidationTest {
 
     @BeforeEach
     public void beforeEach(){
-        user = new User(null, "test@test.ru", "login", "name",  LocalDate.parse("14.10.1999", Config.normalDateFormatter));
+        user = new User(null, "test@test.ru", "login", "name",  LocalDate.parse("14.10.1999", FilmorateConfig.normalDateFormatter));
     }
 
     //Test EMail

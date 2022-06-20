@@ -2,6 +2,6 @@ package ru.yandex.practicum.filmorate.config;
 
 import java.time.format.DateTimeFormatter;
 
-public class Config {
+public class FilmorateConfig {
     public static final DateTimeFormatter normalDateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 }
