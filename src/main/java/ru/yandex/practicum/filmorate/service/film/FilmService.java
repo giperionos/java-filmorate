@@ -1,12 +1,12 @@
 package ru.yandex.practicum.filmorate.service.film;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.UnknownFilmException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.List;
 
@@ -14,12 +14,10 @@ import java.util.List;
 public class FilmService {
 
     private final FilmStorage filmStorage;
-    private final UserStorage userStorage;
 
     @Autowired
-    public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
+    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage) {
         this.filmStorage = filmStorage;
-        this.userStorage = userStorage;
     }
 
     public Film add(Film film) {
@@ -47,43 +45,6 @@ public class FilmService {
         }
 
         return foundedFilm;
-    }
-
-    public void putLike(Long id, Long userId) {
-
-        //получить фильм по id из хранилища
-        Film film = filmStorage.getById(id);
-
-        //если фильма с таким id нет
-        if (film == null) {
-            throw new EntityNotFoundException(String.format("Фильм с %d не найден в хранилище.", id));
-        }
-
-        //если пользователя с таким userId нет
-        if (userStorage.getById(userId) ==  null ) {
-            throw new EntityNotFoundException(String.format("Пользователь с %d не найден в хранилище.", id));
-        }
-
-        //добавить like этому фильму от пользователя
-        film.getLikes().add(userId);
-    }
-
-    public void deleteLike(Long id, Long userId) {
-        //получить фильм по id из хранилища
-        Film film = filmStorage.getById(id);
-
-        //если фильма с таким id нет
-        if (film == null) {
-            throw new EntityNotFoundException(String.format("Фильм с %d не найден в хранилище.", id));
-        }
-
-        //если пользователя с таким userId нет
-        if (userStorage.getById(userId) ==  null ) {
-            throw new EntityNotFoundException(String.format("Пользователь с %d не найден в хранилище.", id));
-        }
-
-        //удалить like этому фильму от пользователя
-        film.getLikes().remove(userId);
     }
 
     public List<Film> getPopularFilms(Long count) {

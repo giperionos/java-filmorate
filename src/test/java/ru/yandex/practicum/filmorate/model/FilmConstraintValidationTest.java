@@ -31,7 +31,14 @@ class FilmConstraintValidationTest {
 
     @BeforeEach
     public void beforeEach(){
-        film = new Film(null, "Matrix", "Super-Mega Film", LocalDate.parse("14.10.1999", FilmorateConfig.normalDateFormatter), 136);
+        film = new Film(
+                null,
+                "Matrix",
+                "Super-Mega Film",
+                LocalDate.parse("14.10.1999", FilmorateConfig.normalDateFormatter),
+                136,
+                new MPARating(1, "G", "У фильма нет возрастных ограничений" ),
+                null);
     }
 
     //Test Name
