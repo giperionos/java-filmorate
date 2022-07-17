@@ -10,7 +10,7 @@ import ru.yandex.practicum.filmorate.config.FilmorateConfig;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.MPARating;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.likes.impl.LikesStorageImpl;
+import ru.yandex.practicum.filmorate.storage.like.impl.LikeStorageImpl;
 import ru.yandex.practicum.filmorate.storage.user.impl.UserDbStorage;
 
 import java.time.LocalDate;
@@ -25,7 +25,7 @@ class FilmDbStorageTest {
 
     private final FilmDbStorage filmDbStorage;
     private final UserDbStorage userDbStorage;
-    private final LikesStorageImpl likesStorage;
+    private final LikeStorageImpl likesStorage;
 
     private static Film film1;
     private static Film film2;

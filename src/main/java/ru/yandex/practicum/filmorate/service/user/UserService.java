@@ -6,22 +6,21 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.UnknownUserException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.friends.UserFriendsStorage;
+import ru.yandex.practicum.filmorate.storage.friend.UserFriendStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class UserService {
 
     private final UserStorage userStorage;
-    private final UserFriendsStorage userFriendsStorage;
+    private final UserFriendStorage userFriendStorage;
 
     @Autowired
-    public UserService(@Qualifier("userDbStorage")UserStorage userStorage, UserFriendsStorage userFriendsStorage) {
+    public UserService(@Qualifier("userDbStorage")UserStorage userStorage, UserFriendStorage userFriendStorage) {
         this.userStorage = userStorage;
-        this.userFriendsStorage = userFriendsStorage;
+        this.userFriendStorage = userFriendStorage;
     }
 
     public User add(User user) {
@@ -70,7 +69,7 @@ public class UserService {
         }
 
         //добавить user-у в друзья пользователя с friendId
-        userFriendsStorage.add(userId, friendId);
+        userFriendStorage.add(userId, friendId);
     }
 
     public void removeFromFriends(Long userId, Long friendId) {
@@ -90,7 +89,7 @@ public class UserService {
         }
 
         //удалить у user-а из друзей пользователя с friendId
-        userFriendsStorage.remove(userId, friendId);
+        userFriendStorage.remove(userId, friendId);
     }
 
     public List<User> getAllUserFriends(Long id) {
@@ -101,11 +100,11 @@ public class UserService {
         }
 
         //вернуть список всех друзей пользователя
-        return userFriendsStorage.getAllFriendsByOwnerUserId(foundedUser.getId());
+        return userFriendStorage.getAllFriendsByOwnerUserId(foundedUser.getId());
     }
 
     public List<User> getCommonUserFriends(Long id, Long otherId) {
         //список друзей, общих с другим пользователем
-        return userFriendsStorage.getCommonUserFriends(id,otherId);
+        return userFriendStorage.getCommonUserFriends(id,otherId);
     }
 }

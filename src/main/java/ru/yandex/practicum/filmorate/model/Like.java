@@ -9,11 +9,11 @@ import lombok.ToString;
 @Setter
 @EqualsAndHashCode
 @ToString
-public class Likes {
+public class Like {
     private Long filmId;
     private Long userId;
 
-    public Likes(Long filmId, Long userId) {
+    public Like(Long filmId, Long userId) {
         this.filmId = filmId;
         this.userId = userId;
     }

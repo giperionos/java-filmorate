@@ -23,7 +23,7 @@ public class RatingStorageImpl implements RatingStorage {
 
     @Override
     public MPARating getById(Integer id) {
-        String sqlQuery = "select * from RATINGS_MPA where RATING_ID = ?";
+        String sqlQuery = "select * from RATING_MPA where RATING_ID = ?";
         List<MPARating> ratings = jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> mapRowToRatingMPA(rs)), id);
         if (ratings.size() != 1) {
             throw new EntityNotFoundException(String.format("Сущность с %d не найдена в хранилище.", id));
@@ -33,7 +33,7 @@ public class RatingStorageImpl implements RatingStorage {
 
     @Override
     public List<MPARating> getAll() {
-        String sqlQuery = "select * from RATINGS_MPA";
+        String sqlQuery = "select * from RATING_MPA";
         return jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> mapRowToRatingMPA(rs)));
     }
 

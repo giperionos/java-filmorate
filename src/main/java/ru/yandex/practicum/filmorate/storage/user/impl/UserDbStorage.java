@@ -27,7 +27,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User add(User entity) {
-        String sqlQuery = "insert into USERS (EMAIL, LOGIN, USER_NAME, BIRTHDAY) VALUES ( ?, ?, ?, ? )";
+        String sqlQuery = "insert into \"USER\" (EMAIL, LOGIN, USER_NAME, BIRTHDAY) VALUES ( ?, ?, ?, ? )";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
@@ -52,7 +52,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User update(User entity) {
-        String sqlQuery = "update USERS set EMAIL = ?, LOGIN = ?, USER_NAME = ?, BIRTHDAY = ? where USER_ID = ?";
+        String sqlQuery = "update \"USER\" set EMAIL = ?, LOGIN = ?, USER_NAME = ?, BIRTHDAY = ? where USER_ID = ?";
 
         int isUpdated = jdbcTemplate.update(sqlQuery
                 , entity.getEmail()
@@ -71,18 +71,18 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public List<User> getAll() {
-        String sqlQuery = "select USER_ID, EMAIL, LOGIN, USER_NAME, BIRTHDAY from USERS";
+        String sqlQuery = "select USER_ID, EMAIL, LOGIN, USER_NAME, BIRTHDAY from \"USER\"";
 
         return jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> mapRowToUser(rs)));
     }
 
     @Override
     public User getById(Long id) {
-        String sqlQuery = "select USER_ID, EMAIL, LOGIN, USER_NAME, BIRTHDAY from USERS where USER_ID = ?";
+        String sqlQuery = "select USER_ID, EMAIL, LOGIN, USER_NAME, BIRTHDAY from \"USER\" where USER_ID = ?";
         List<User> users = jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> mapRowToUser(rs)), id);
 
         if (users.size() != 1) {
-            throw new EntityNotFoundException(String.format("Сущность с %d не найдена в таблице USERS:", id));
+            throw new EntityNotFoundException(String.format("Сущность с %d не найдена в таблице USER:", id));
         }
 
         return users.get(0);
@@ -90,7 +90,7 @@ public class UserDbStorage implements UserStorage {
 
 
     public boolean deleteAll() {
-        String sqlQuery = "delete from USERS cascade;";
+        String sqlQuery = "delete from \"USER\" cascade;";
 
         return jdbcTemplate.update(sqlQuery) > 0;
     }

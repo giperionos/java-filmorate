@@ -8,7 +8,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.config.FilmorateConfig;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.model.UserFriends;
+import ru.yandex.practicum.filmorate.model.UserFriend;
+import ru.yandex.practicum.filmorate.storage.friend.impl.UserFriendStorageImpl;
 import ru.yandex.practicum.filmorate.storage.user.impl.UserDbStorage;
 
 import java.time.LocalDate;
@@ -19,9 +20,9 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-class UserFriendsStorageImplTest {
+class UserFriendStorageImplTest {
 
-    private final UserFriendsStorageImpl userFriendsStorage;
+    private final UserFriendStorageImpl userFriendsStorage;
     private final UserDbStorage userDbStorage;
     private static User userFirst;
     private static User userSecond;
@@ -50,10 +51,10 @@ class UserFriendsStorageImplTest {
         //затем добавить дружбу
         userFriendsStorage.add(userFirst.getId(), userSecond.getId());
 
-        UserFriends userFriends = userFriendsStorage.getByOwnerId(userFirst.getId());
+        UserFriend userFriend = userFriendsStorage.getByOwnerId(userFirst.getId());
 
-        assertEquals(userFirst.getId(), userFriends.getOwnerUserId(), "Id добавленного пользователя не совпадает.");
-        assertEquals(userSecond.getId(), userFriends.getFriendId(), "Id добавленного друга не совпадает.");
+        assertEquals(userFirst.getId(), userFriend.getOwnerUserId(), "Id добавленного пользователя не совпадает.");
+        assertEquals(userSecond.getId(), userFriend.getFriendId(), "Id добавленного друга не совпадает.");
     }
 
     @Test
