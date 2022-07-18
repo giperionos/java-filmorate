@@ -50,4 +50,12 @@ public abstract class InMemoryEntityStorage<T extends Entity> implements Storage
     public T getById(Long id) {
         return entities.get(id);
     }
+
+    @Override
+    public void deleteById(Long id)  {
+        if (!entities.containsKey(id)) {
+            throw new EntityNotFoundException(String.format("Сущность с %d не найдена в хранилище.", id));
+        }
+        entities.remove(id);
+    }
 }
