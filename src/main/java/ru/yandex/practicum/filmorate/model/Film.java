@@ -4,25 +4,29 @@ import lombok.*;
 import ru.yandex.practicum.filmorate.validators.DateNotEarlier;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Getter
 @Setter
-@EqualsAndHashCode
 @ToString
 public class Film extends Entity {
 
-    public Film(Long id, String name, String description, LocalDate releaseDate, Integer duration) {
+    public Film(Long id, String name, String description, LocalDate releaseDate, Integer duration, MPARating mpa, Set<Genre> genres) {
         super(id);
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
-        this.likes = new HashSet<>();
+        this.mpa = mpa;
+        this.genres = genres;
+    }
+
+    public Film() {
+        super(null);
     }
 
     @NotBlank(message = "Название фильма не должно быть пустым.")
@@ -37,5 +41,28 @@ public class Film extends Entity {
     @Positive(message = "Продолжительность фильма должна быть положительной.")
     private Integer duration;
 
+    //оставлено для работоспособности InMemory-реализации
     private Set<Long> likes;
+
+    @NotNull
+    private MPARating mpa;
+
+    private Set<Genre> genres;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Film film = (Film) o;
+        return name.equals(film.name)
+                && description.equals(film.description)
+                && releaseDate.equals(film.releaseDate)
+                && duration.longValue() == film.duration.longValue()
+                && mpa.getId().intValue() == film.mpa.getId().intValue();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, description, releaseDate, duration, likes, mpa.getId());
+    }
 }

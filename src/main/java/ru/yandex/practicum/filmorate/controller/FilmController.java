@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
+import ru.yandex.practicum.filmorate.service.like.LikeService;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -15,10 +16,12 @@ import java.util.List;
 public class FilmController {
 
     private final FilmService filmService;
+    private final LikeService likeService;
 
     @Autowired
-    public FilmController(FilmService filmService) {
+    public FilmController(FilmService filmService, LikeService likeService) {
         this.filmService = filmService;
+        this.likeService = likeService;
     }
 
     @PostMapping
@@ -51,12 +54,12 @@ public class FilmController {
 
     @PutMapping("/{id}/like/{userId}")
     public void putLike(@PathVariable Long id, @PathVariable Long userId) {
-        filmService.putLike(id, userId);
+        likeService.addLike(id, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
     public void deleteLike(@PathVariable Long id, @PathVariable Long userId) {
-        filmService.deleteLike(id, userId);
+        likeService.removeLike(id, userId);
     }
 
     @GetMapping("/popular") //?count={count}

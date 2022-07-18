@@ -1,23 +1,26 @@
 package ru.yandex.practicum.filmorate.service.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.UnknownUserException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.friend.UserFriendStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class UserService {
 
     private final UserStorage userStorage;
+    private final UserFriendStorage userFriendStorage;
 
     @Autowired
-    public UserService(UserStorage userStorage) {
+    public UserService(@Qualifier("userDbStorage")UserStorage userStorage, UserFriendStorage userFriendStorage) {
         this.userStorage = userStorage;
+        this.userFriendStorage = userFriendStorage;
     }
 
     public User add(User user) {
@@ -47,8 +50,10 @@ public class UserService {
     }
 
     public void addToFriends(Long userId, Long friendId) {
-        //То есть если Лена стала другом Саши, то это значит, что Саша теперь друг Лены
-        //значит добавить в друзья нужно их обоих друг другу
+
+        //Дружба должна стать односторонней.
+        //Это значит, что если какой-то пользователь оставил вам заявку в друзья,
+        //то он будет в списке ваших друзей, а вы в его — нет
 
         //сначала найден этих пользователей
         User user = userStorage.getById(userId);
@@ -64,10 +69,7 @@ public class UserService {
         }
 
         //добавить user-у в друзья пользователя с friendId
-        user.getFriends().add(friendId);
-
-        //и наоборот
-        friend.getFriends().add(userId);
+        userFriendStorage.add(userId, friendId);
     }
 
     public void removeFromFriends(Long userId, Long friendId) {
@@ -87,10 +89,7 @@ public class UserService {
         }
 
         //удалить у user-а из друзей пользователя с friendId
-        user.getFriends().remove(friendId);
-
-        //и наоборот
-        friend.getFriends().remove(userId);
+        userFriendStorage.remove(userId, friendId);
     }
 
     public List<User> getAllUserFriends(Long id) {
@@ -101,29 +100,11 @@ public class UserService {
         }
 
         //вернуть список всех друзей пользователя
-        List<User> users = new ArrayList<>();
-
-        for(Long key: foundedUser.getFriends()){
-            users.add(userStorage.getById(key));
-        }
-
-        return users;
+        return userFriendStorage.getAllFriendsByOwnerUserId(foundedUser.getId());
     }
 
     public List<User> getCommonUserFriends(Long id, Long otherId) {
         //список друзей, общих с другим пользователем
-
-        //список друзей первого пользователя
-        List<User> oneUserFriends = getAllUserFriends(id);
-        List<User> anotherUserFriends = getAllUserFriends(otherId);
-        List<User> commonUserFriends = new ArrayList<>();
-
-        for (User friend: oneUserFriends) {
-            if (anotherUserFriends.contains(friend)) {
-                commonUserFriends.add(friend);
-            }
-        }
-
-        return commonUserFriends;
+        return userFriendStorage.getCommonUserFriends(id,otherId);
     }
 }
