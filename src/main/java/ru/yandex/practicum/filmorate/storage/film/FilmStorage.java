@@ -9,4 +9,10 @@ public interface FilmStorage extends Storage<Film> {
     //методы свойственные именно для Film
 
     List<Film> getMostPopularList(Long count);
+
+    List<Film> getFilmsForDirectorSortedByYears(Integer directorId);
+
+    List<Film> getFilmsForDirectorSortedByLikes(Integer directorId);
+
+    List<Film> getFilmsForDirectorSortedByYearsAndLikes(Integer directorId);
 }

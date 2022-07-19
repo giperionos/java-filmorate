@@ -40,6 +40,7 @@ class FilmGenreStorageImplTest {
                 LocalDate.parse("14.10.1999", FilmorateConfig.normalDateFormatter),
                 136,
                 new MPARating(4, "R", "Лицам до 17 лет просматривать фильм можно только в присутствии взрослого" ),
+                null,
                 null);
 
         comedyGenre = new Genre(1, "Комедия");

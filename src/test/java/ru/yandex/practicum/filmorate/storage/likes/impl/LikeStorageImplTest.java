@@ -42,6 +42,7 @@ class LikeStorageImplTest {
                 LocalDate.parse("14.10.1999", FilmorateConfig.normalDateFormatter),
                 136,
                 new MPARating(1,null, null),
+                null,
                 null
         );
 

@@ -40,6 +40,7 @@ class FilmDbStorageTest {
                 LocalDate.parse("14.10.1999", FilmorateConfig.normalDateFormatter),
                 136,
                 new MPARating(4, "R", "Лицам до 17 лет просматривать фильм можно только в присутствии взрослого" ),
+                null,
                 null);
 
         film2 = new Film(
@@ -49,6 +50,7 @@ class FilmDbStorageTest {
                 LocalDate.parse("17.01.1998", FilmorateConfig.normalDateFormatter),
                 136,
                 new MPARating(3, "PG-13", "Детям до 13 лет просмотр не желателен" ),
+                null,
                 null);
 
         film3 = new Film(
@@ -58,6 +60,7 @@ class FilmDbStorageTest {
                 LocalDate.parse("17.11.1995", FilmorateConfig.normalDateFormatter),
                 136,
                 new MPARating(3, "PG-13", "Детям до 13 лет просмотр не желателен" ),
+                null,
                 null);
     }
 

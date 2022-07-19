@@ -38,6 +38,7 @@ class FilmConstraintValidationTest {
                 LocalDate.parse("14.10.1999", FilmorateConfig.normalDateFormatter),
                 136,
                 new MPARating(1, "G", "У фильма нет возрастных ограничений" ),
+                null,
                 null);
     }
 

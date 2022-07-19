@@ -72,4 +72,10 @@ public class FilmController {
         log.debug(String.format("Обработка DELETE запроса по пути /films на удаление фильма id=%d", id));
         filmService.deleteFilmById(id);
     }
+
+    //GET /films/director/{directorId}?sortBy=[year,likes]
+    @GetMapping("/director/{directorId}")
+    public List<Film> getSortedFilmsForDirector(@PathVariable Integer directorId, @RequestParam String sortBy) {
+        return filmService.getSortedFilmsForDirector(directorId, sortBy);
+    }
 }
