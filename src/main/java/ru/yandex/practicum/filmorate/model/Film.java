@@ -41,9 +41,6 @@ public class Film extends Entity {
     @Positive(message = "Продолжительность фильма должна быть положительной.")
     private Integer duration;
 
-    //оставлено для работоспособности InMemory-реализации
-    private Set<Long> likes;
-
     @NotNull
     private MPARating mpa;
 
@@ -63,6 +60,6 @@ public class Film extends Entity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, releaseDate, duration, likes, mpa.getId());
+        return Objects.hash(name, description, releaseDate, duration, mpa.getId());
     }
 }
