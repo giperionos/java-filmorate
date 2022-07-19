@@ -103,6 +103,10 @@ public class FilmService {
         return popularFilms;
     }
 
+    public void deleteFilmById(Long id) {
+        filmStorage.deleteById(id);
+    }
+
     private void fillGenreForFilm(Film film) {
 
         List<FilmGenre> filmDBGenres = filmGenreStorage.getByFilmId(film.getId());

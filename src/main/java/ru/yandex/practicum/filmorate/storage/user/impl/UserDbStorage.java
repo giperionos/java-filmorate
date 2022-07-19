@@ -7,6 +7,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.UnknownUserException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -103,5 +104,12 @@ public class UserDbStorage implements UserStorage {
             rs.getString("USER_NAME"),
             rs.getDate("BIRTHDAY") .toLocalDate()
         );
+    }
+
+    public void deleteById(Long id) {
+        String sqlQuery = "delete from \"USER\" where USER_ID = ?";
+        if (jdbcTemplate.update(sqlQuery, id) == 0) {
+            throw new UnknownUserException(String.format("Сущность с id=%d не найдена в таблице USER:", id));
+        }
     }
 }

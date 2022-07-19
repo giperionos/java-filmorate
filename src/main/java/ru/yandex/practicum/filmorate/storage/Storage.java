@@ -17,4 +17,6 @@ public interface Storage<T extends Entity> {
 
     //вернуть сущность по id
     T getById(Long id);
+
+    void deleteById(Long id);
 }

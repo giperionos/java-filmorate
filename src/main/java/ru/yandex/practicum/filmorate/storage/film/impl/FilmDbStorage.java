@@ -7,6 +7,8 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.UnknownFilmException;
+import ru.yandex.practicum.filmorate.exceptions.UnknownUserException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.MPARating;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
@@ -150,6 +152,13 @@ public class FilmDbStorage implements FilmStorage {
                 "LIMIT ?;";
 
         return jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> mapRowToFilm(rs)), count);
+    }
+
+    public void deleteById(Long id) {
+        String sqlQuery = "delete from FILM where FILM_ID = ?";
+        if (jdbcTemplate.update(sqlQuery, id) == 0) {
+            throw new UnknownFilmException(String.format("Сущность с id=%d не найдена в таблице FILM:", id));
+        }
     }
 
     //likes

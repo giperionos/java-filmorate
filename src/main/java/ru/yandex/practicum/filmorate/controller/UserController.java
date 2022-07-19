@@ -70,4 +70,10 @@ public class UserController {
     public List<User> getCommonUserFriends(@PathVariable Long id, @PathVariable Long otherId) {
         return userService.getCommonUserFriends(id, otherId);
     }
+
+    @DeleteMapping("/{id}")
+    public void removeUserById(@PathVariable Long id) {
+        log.debug(String.format("Обработка DELETE запроса по пути /users на удаление пользователя id=%d", id));
+        userService.removeUserById(id);
+    }
 }
