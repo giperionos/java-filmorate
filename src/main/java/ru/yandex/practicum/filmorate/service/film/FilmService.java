@@ -14,10 +14,7 @@ import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.rating.RatingStorage;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 @Service
 public class FilmService {
@@ -91,9 +88,8 @@ public class FilmService {
         return foundedFilm;
     }
 
-    public List<Film> getPopularFilms(Long count) {
-
-        List<Film> popularFilms = filmStorage.getMostPopularList(count);
+    public List<Film> getPopularFilms(Long count, Optional<Integer> genreId, Optional<Integer> year) {
+        List<Film> popularFilms = filmStorage.getMostPopularList(count, genreId, year);
 
         //заполнить жанры для фильмов
         for (Film film: popularFilms) {
