@@ -184,7 +184,73 @@ public class FilmDbStorage implements FilmStorage {
                 rs.getDate("RELEASE_DATE").toLocalDate(),
                 rs.getInt("DURATION"),
                 new MPARating(rs.getInt("RATING_ID"), rs.getString("RATING_NAME"), rs.getString("RATING_DESCRIPTION")),
+                null,
                 null
         );
+    }
+
+    @Override
+    public List<Film> getFilmsForDirectorSortedByYears(Integer directorId) {
+        String sqlQuery = "select\n" +
+                "    F.FILM_ID,\n" +
+                "    F.FILM_NAME,\n" +
+                "    F.FILM_DESCRIPTION,\n" +
+                "    F.RELEASE_DATE,\n" +
+                "    F.DURATION,\n" +
+                "    F.RATING_MPA_ID,\n" +
+                "    RM.RATING_ID,\n" +
+                "    RM.RATING_NAME,\n" +
+                "    RM.RATING_DESCRIPTION\n" +
+                "from FILM F\n" +
+                "LEFT JOIN RATING_MPA RM on RM.RATING_ID = F.RATING_MPA_ID\n" +
+                "LEFT JOIN FILM_DIRECTOR FD on F.FILM_ID = FD.FILM_ID\n" +
+                "where fd.DIRECTOR_ID = ?\n" +
+                "order by F.RELEASE_DATE ;";
+
+        return jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> mapRowToFilm(rs)), directorId);
+    }
+
+    @Override
+    public List<Film> getFilmsForDirectorSortedByLikes(Integer directorId) {
+        String sqlQuery = "select\n" +
+                "    F.FILM_ID,\n" +
+                "    F.FILM_NAME,\n" +
+                "    F.FILM_DESCRIPTION,\n" +
+                "    F.RELEASE_DATE,\n" +
+                "    F.DURATION,\n" +
+                "    F.RATING_MPA_ID,\n" +
+                "    RM.RATING_ID,\n" +
+                "    RM.RATING_NAME,\n" +
+                "    RM.RATING_DESCRIPTION,\n" +
+                "    (select count(1) from \"LIKE\" L where L.FILM_ID = F.FILM_ID) as priority\n" +
+                "from FILM F\n" +
+                "LEFT JOIN RATING_MPA RM on RM.RATING_ID = F.RATING_MPA_ID\n" +
+                "LEFT JOIN FILM_DIRECTOR FD on F.FILM_ID = FD.FILM_ID\n" +
+                "where fd.DIRECTOR_ID = ?\n" +
+                "order by priority desc;";
+
+        return jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> mapRowToFilm(rs)), directorId);
+    }
+
+    @Override
+    public List<Film> getFilmsForDirectorSortedByYearsAndLikes(Integer directorId) {
+        String sqlQuery = "select\n" +
+                "    F.FILM_ID,\n" +
+                "    F.FILM_NAME,\n" +
+                "    F.FILM_DESCRIPTION,\n" +
+                "    F.RELEASE_DATE,\n" +
+                "    F.DURATION,\n" +
+                "    F.RATING_MPA_ID,\n" +
+                "    RM.RATING_ID,\n" +
+                "    RM.RATING_NAME,\n" +
+                "    RM.RATING_DESCRIPTION,\n" +
+                "    (select count(1) from \"LIKE\" L where L.FILM_ID = F.FILM_ID) as priority\n" +
+                "from FILM F\n" +
+                "LEFT JOIN RATING_MPA RM on RM.RATING_ID = F.RATING_MPA_ID\n" +
+                "LEFT JOIN FILM_DIRECTOR FD on F.FILM_ID = FD.FILM_ID\n" +
+                "where fd.DIRECTOR_ID = ?\n" +
+                "order by F.RELEASE_DATE, priority desc;";
+
+        return jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> mapRowToFilm(rs)), directorId);
     }
 }

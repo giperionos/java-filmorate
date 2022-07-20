@@ -11,4 +11,9 @@ public interface FilmStorage extends Storage<Film> {
 
     List<Film> getMostPopularList(Long count, Optional<Integer> genreId, Optional<Integer> year);
 
+    List<Film> getFilmsForDirectorSortedByYears(Integer directorId);
+
+    List<Film> getFilmsForDirectorSortedByLikes(Integer directorId);
+
+    List<Film> getFilmsForDirectorSortedByYearsAndLikes(Integer directorId);
 }

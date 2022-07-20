@@ -15,7 +15,7 @@ import java.util.*;
 @ToString
 public class Film extends Entity {
 
-    public Film(Long id, String name, String description, LocalDate releaseDate, Integer duration, MPARating mpa, Set<Genre> genres) {
+    public Film(Long id, String name, String description, LocalDate releaseDate, Integer duration, MPARating mpa, Set<Genre> genres, Set<Director> directors) {
         super(id);
         this.name = name;
         this.description = description;
@@ -23,6 +23,7 @@ public class Film extends Entity {
         this.duration = duration;
         this.mpa = mpa;
         this.genres = genres;
+        this.directors = directors;
     }
 
     public Film() {
@@ -45,6 +46,8 @@ public class Film extends Entity {
     private MPARating mpa;
 
     private Set<Genre> genres;
+
+    private Set<Director> directors;
 
     @Override
     public boolean equals(Object o) {
