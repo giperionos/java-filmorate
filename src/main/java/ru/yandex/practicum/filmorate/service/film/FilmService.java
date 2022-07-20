@@ -121,6 +121,13 @@ public class FilmService {
         return popularFilms;
     }
 
+    public List<Film> getFilmsByQuery(String query, String by) {
+        final List<Film> films = filmStorage.getFilmsByQuery(query, by);
+        films.forEach(this::fillGenreForFilm);
+        films.forEach(this::fillDirectorForFilm);
+        return films;
+    }
+
     public void deleteFilmById(Long id) {
         filmStorage.deleteById(id);
     }
