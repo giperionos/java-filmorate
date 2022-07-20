@@ -3,10 +3,14 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.film.FilmService;
+import ru.yandex.practicum.filmorate.service.like.LikeService;
 import ru.yandex.practicum.filmorate.service.user.UserService;
 
 import javax.validation.Valid;
+import java.util.Collection;
 import java.util.List;
 
 
@@ -16,10 +20,12 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final FilmService filmService;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, FilmService filmService) {
         this.userService = userService;
+        this.filmService = filmService;
     }
 
     @PostMapping
@@ -75,5 +81,10 @@ public class UserController {
     public void removeUserById(@PathVariable Long id) {
         log.debug(String.format("Обработка DELETE запроса по пути /users на удаление пользователя id=%d", id));
         userService.removeUserById(id);
+    }
+
+    @GetMapping("/{id}/recommendations")
+    public Collection<Film> getRecomendations(@PathVariable Long id) {
+        return filmService.getRecomendations(id);
     }
 }

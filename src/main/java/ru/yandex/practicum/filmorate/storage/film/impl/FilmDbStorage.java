@@ -174,6 +174,34 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
+    @Override
+    public Collection<Film> getRecomendations(Long userId) {
+        final String sqlQuery = "select\n" +
+                "    FILM_ID\n" +
+                "from \"LIKE\" as L\n" +
+                "    inner join (\n" +
+                "    select top 1\n" +
+                "        USER_ID,\n" +
+                "        COUNT(FILM_ID) as LIKE_COUNT\n" +
+                "    from \"LIKE\"\n" +
+                "    where USER_ID <> ? and\n" +
+                "          FILM_ID in (select\n" +
+                "                        FILM_ID\n" +
+                "                      from \"LIKE\"\n" +
+                "                      where USER_ID = ?)\n" +
+                "    group by USER_ID\n" +
+                "    order by LIKE_COUNT desc) as M\n" +
+                "on M.USER_ID = L.USER_ID\n" +
+                "where FILM_ID not in (\n" +
+                "    select\n" +
+                "        FILM_ID\n" +
+                "    from \"LIKE\"\n" +
+                "    where USER_ID = ?\n" +
+                "    )";
+
+        return jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> getById(rs.getLong("FILM_ID"))), userId, userId, userId);
+    }
+
     //likes
     public Film mapRowToFilm(ResultSet rs) throws SQLException {
 
