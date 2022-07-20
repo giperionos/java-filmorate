@@ -109,9 +109,8 @@ public class FilmService {
         return foundedFilm;
     }
 
-    public List<Film> getPopularFilms(Long count) {
-
-        List<Film> popularFilms = filmStorage.getMostPopularList(count);
+    public List<Film> getPopularFilms(Long count, Optional<Integer> genreId, Optional<Integer> year) {
+        List<Film> popularFilms = filmStorage.getMostPopularList(count, genreId, year);
 
         //заполнить жанры и режиссеров для фильмов
         for (Film film: popularFilms) {
