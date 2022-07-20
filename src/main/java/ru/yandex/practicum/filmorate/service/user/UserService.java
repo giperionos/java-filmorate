@@ -107,4 +107,8 @@ public class UserService {
         //список друзей, общих с другим пользователем
         return userFriendStorage.getCommonUserFriends(id,otherId);
     }
+
+    public void removeUserById(Long id) {
+        userStorage.deleteById(id);
+    }
 }

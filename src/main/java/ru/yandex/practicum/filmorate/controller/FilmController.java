@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.service.like.LikeService;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/films")
@@ -63,7 +64,22 @@ public class FilmController {
     }
 
     @GetMapping("/popular") //?count={count}
-    public List<Film> getPopularFilms(@RequestParam(defaultValue = "10") Long count) {
-        return filmService.getPopularFilms(count);
+    public List<Film> getPopularFilms(@RequestParam(defaultValue = "10") Long count,
+                                      @RequestParam Optional<Integer> genreId,
+                                      @RequestParam Optional<Integer> year) {
+        return filmService.getPopularFilms(count, genreId, year);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteFilmById(@PathVariable Long id) {
+        log.debug(String.format("Обработка DELETE запроса по пути /films на удаление фильма id=%d", id));
+        filmService.deleteFilmById(id);
+    }
+
+
+    //GET /films/director/{directorId}?sortBy=[year,likes]
+    @GetMapping("/director/{directorId}")
+    public List<Film> getSortedFilmsForDirector(@PathVariable Integer directorId, @RequestParam String sortBy) {
+        return filmService.getSortedFilmsForDirector(directorId, sortBy);
     }
 }

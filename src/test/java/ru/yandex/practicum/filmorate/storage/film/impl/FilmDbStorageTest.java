@@ -15,6 +15,7 @@ import ru.yandex.practicum.filmorate.storage.user.impl.UserDbStorage;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -40,6 +41,7 @@ class FilmDbStorageTest {
                 LocalDate.parse("14.10.1999", FilmorateConfig.normalDateFormatter),
                 136,
                 new MPARating(4, "R", "Лицам до 17 лет просматривать фильм можно только в присутствии взрослого" ),
+                null,
                 null);
 
         film2 = new Film(
@@ -49,6 +51,7 @@ class FilmDbStorageTest {
                 LocalDate.parse("17.01.1998", FilmorateConfig.normalDateFormatter),
                 136,
                 new MPARating(3, "PG-13", "Детям до 13 лет просмотр не желателен" ),
+                null,
                 null);
 
         film3 = new Film(
@@ -58,6 +61,7 @@ class FilmDbStorageTest {
                 LocalDate.parse("17.11.1995", FilmorateConfig.normalDateFormatter),
                 136,
                 new MPARating(3, "PG-13", "Детям до 13 лет просмотр не желателен" ),
+                null,
                 null);
     }
 
@@ -138,7 +142,7 @@ class FilmDbStorageTest {
         //пусть у фильма 2 не будет лайков
 
         //получить список популярных
-        List<Film> popularFilms = filmDbStorage.getMostPopularList(10L);
+        List<Film> popularFilms = filmDbStorage.getMostPopularList(10L, Optional.empty(), Optional.empty());
 
         //Должны фильмы в порядке: 3 1 2
         assertEquals(film3.getId(), popularFilms.get(0).getId(), "Ожидаемый фильм не находится в нужной позиции списка.");
@@ -147,7 +151,8 @@ class FilmDbStorageTest {
 
 
         //проверить ограничения на выдачу кол-во элементов списка
-        List<Film> popular2Films = filmDbStorage.getMostPopularList(2L);
+        List<Film> popular2Films = filmDbStorage.getMostPopularList(2L, Optional.empty(), Optional.empty());
         assertEquals(2, popular2Films.size(), "Количество элементов списка не совпадает с ожидаемым.");
     }
+
 }

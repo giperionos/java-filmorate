@@ -15,7 +15,7 @@ import java.util.*;
 @ToString
 public class Film extends Entity {
 
-    public Film(Long id, String name, String description, LocalDate releaseDate, Integer duration, MPARating mpa, Set<Genre> genres) {
+    public Film(Long id, String name, String description, LocalDate releaseDate, Integer duration, MPARating mpa, Set<Genre> genres, Set<Director> directors) {
         super(id);
         this.name = name;
         this.description = description;
@@ -23,6 +23,7 @@ public class Film extends Entity {
         this.duration = duration;
         this.mpa = mpa;
         this.genres = genres;
+        this.directors = directors;
     }
 
     public Film() {
@@ -41,13 +42,12 @@ public class Film extends Entity {
     @Positive(message = "Продолжительность фильма должна быть положительной.")
     private Integer duration;
 
-    //оставлено для работоспособности InMemory-реализации
-    private Set<Long> likes;
-
     @NotNull
     private MPARating mpa;
 
     private Set<Genre> genres;
+
+    private Set<Director> directors;
 
     @Override
     public boolean equals(Object o) {
@@ -63,6 +63,6 @@ public class Film extends Entity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, releaseDate, duration, likes, mpa.getId());
+        return Objects.hash(name, description, releaseDate, duration, mpa.getId());
     }
 }
