@@ -281,4 +281,33 @@ public class FilmDbStorage implements FilmStorage {
 
         return jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> mapRowToFilm(rs)), directorId);
     }
+
+    public List<Film> getFilmsByQuery(String query, String by) {
+        final String sqlQuery =
+                "SELECT " +
+                "    FR.*, " +
+                "    RM.* " +
+                "FROM " +
+                "    (SELECT " +
+                "        F.FILM_ID, " +
+                "        GROUP_CONCAT(D.DIRECTOR_NAME SEPARATOR '|') AS director, " +
+                "        FILM_NAME title " +
+                "    FROM FILM F " +
+                "    LEFT JOIN FILM_DIRECTOR FD on F.FILM_ID = FD.FILM_ID " +
+                "    LEFT JOIN DIRECTOR D on FD.DIRECTOR_ID = D.DIRECTOR_ID " +
+                "    GROUP BY F.FILM_ID) F " +
+                "LEFT JOIN FILM FR ON FR.FILM_ID = F.FILM_ID " +
+                "LEFT JOIN RATING_MPA RM on FR.RATING_MPA_ID = RM.RATING_ID " +
+                "LEFT JOIN ( " +
+                "    SELECT " +
+                "        FILM_ID, " +
+                "        COUNT(USER_ID) LIKES " +
+                "    FROM \"LIKE\" " +
+                "    GROUP BY FILM_ID " +
+                "    ) L ON F.FILM_ID = L.FILM_ID " +
+                "WHERE CONCAT_WS('|', " + by + " , '|') ILIKE CONCAT('%',?,'%') " +
+                "ORDER BY LIKES DESC";
+
+        return jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> mapRowToFilm(rs)), query);
+    }
 }
