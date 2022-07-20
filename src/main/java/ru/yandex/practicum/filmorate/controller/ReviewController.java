@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Review;
@@ -15,19 +16,16 @@ import java.util.List;
 @Slf4j
 public class ReviewController {
 
-    ReviewService reviewService;
+    private final ReviewService reviewService;
 
+    @Autowired
     public ReviewController(ReviewService reviewService) {
         this.reviewService = reviewService;
     }
 
     @PostMapping
-    public Review addNewReview (@Valid @RequestBody Review review){
+    public Review addNewReview(@Valid @RequestBody Review review){
         log.debug("Добавление POST запроса /reviews");
-        if(review.getFilmId() < 0 || review.getUserId() < 0){
-            throw new ValidationException("неверный filmId или userId");
-        }
-
         return reviewService.addNewReview(review);
     }
 
@@ -48,7 +46,7 @@ public class ReviewController {
     }
 
     @GetMapping
-    public List<Review> getAllReviewes (@RequestParam (defaultValue = "10") Integer count,
+    public List<Review> getAllReviewes(@RequestParam (defaultValue = "10") Integer count,
                                         @RequestParam (required = false) Long filmId) {
         if(filmId == null){
             return reviewService.getAllReviewes(count);

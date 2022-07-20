@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.review;
+package ru.yandex.practicum.filmorate.storage.review.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -10,6 +10,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Review;
+import ru.yandex.practicum.filmorate.storage.review.ReviewStorage;
 
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Date;
@@ -19,7 +20,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 @Component
-public class ReviewDBStorage implements ReviewStorage{
+public class ReviewDBStorage implements ReviewStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -27,6 +28,7 @@ public class ReviewDBStorage implements ReviewStorage{
     public ReviewDBStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
+
     @Override
     public Review addNewReview(Review review){
             String sqlQuery = "insert into REVIEW (REVIEW_CONTENT, IS_POSITIVE, USER_ID, FILM_ID, USEFUL) " +

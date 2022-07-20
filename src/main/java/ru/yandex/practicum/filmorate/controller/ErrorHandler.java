@@ -34,10 +34,4 @@ public class ErrorHandler {
         log.error(exception.toString());
         return exception.getMessage();
     }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String handleNullPointerException (final ValidationException exception) {
-        return exception.getMessage();
-    }
 }

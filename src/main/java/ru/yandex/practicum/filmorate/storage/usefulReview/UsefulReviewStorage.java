@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.usefulReview;
 
 public interface UsefulReviewStorage {
-    //int getUseful(long id);
 
     boolean addLikeReview(Long id, Long userId);
 

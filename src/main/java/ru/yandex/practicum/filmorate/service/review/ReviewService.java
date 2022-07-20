@@ -1,24 +1,51 @@
 package ru.yandex.practicum.filmorate.service.review;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Review;
+import ru.yandex.practicum.filmorate.service.film.FilmService;
+import ru.yandex.practicum.filmorate.service.user.UserService;
 import ru.yandex.practicum.filmorate.storage.review.ReviewStorage;
 import ru.yandex.practicum.filmorate.storage.usefulReview.UsefulReviewStorage;
 
 import java.util.List;
 
 @Service
+@Slf4j
 public class ReviewService {
 
-    ReviewStorage reviewStorage;
-    UsefulReviewStorage usefulReviewStorage;
+    private final ReviewStorage reviewStorage;
+    private final UsefulReviewStorage usefulReviewStorage;
+    private final UserService userService;
+    private final FilmService filmService;
 
-    public ReviewService(ReviewStorage reviewStorage, UsefulReviewStorage usefulReviewStorage) {
+    @Autowired
+    public ReviewService(ReviewStorage reviewStorage, UsefulReviewStorage usefulReviewStorage, UserService userService, FilmService filmService) {
         this.reviewStorage = reviewStorage;
         this.usefulReviewStorage = usefulReviewStorage;
+        this.userService = userService;
+        this.filmService = filmService;
     }
 
     public Review addNewReview(Review review) {
+        //перед добавлением проверить, что такой пользователь и фильм вообще есть
+        try {
+            userService.getUserById(review.getUserId());
+        } catch (EntityNotFoundException e) {
+            log.warn("В review пришел неизвестный пользователь.");
+            throw e;
+        }
+
+        try {
+            filmService.getFilmById(review.getFilmId());
+        } catch (EntityNotFoundException e) {
+
+            log.warn("В review пришел неизвестный фильм.");
+            throw e;
+        }
+
         return reviewStorage.addNewReview(review);
     }
 

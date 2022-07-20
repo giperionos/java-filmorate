@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.model;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
@@ -10,19 +11,24 @@ import javax.validation.constraints.NotBlank;
 @ToString
 public class Review {
 
-    private long reviewId;
+    private Long reviewId;
+
     @NotBlank(message = "Отзыв не должно быть пустым.")
     private String content;
-    @NonNull
+
+    @NotNull
     private Boolean isPositive;
-    @NonNull
+
+    @NotNull
     private Long userId;
-    @NonNull
+
+    @NotNull
     private Long filmId;
+
     private int useful = 0;
 
-    public Review(long reviewId, String content, boolean isPositive,
-                  @NonNull long userId, @NonNull long filmId, int useful) {
+    public Review(Long reviewId, String content, Boolean isPositive,
+                  Long userId,  Long filmId, int useful) {
         this.reviewId = reviewId;
         this.content = content;
         this.isPositive = isPositive;
@@ -34,11 +40,11 @@ public class Review {
     public Review() {
     }
 
-    public boolean getIsPositive() {
+   /* public boolean getIsPositive() {
         return this.isPositive;
     }
 
     public void setIsPositive(boolean isPositive) {
         this.isPositive = isPositive;
-    }
+    }*/
 }
