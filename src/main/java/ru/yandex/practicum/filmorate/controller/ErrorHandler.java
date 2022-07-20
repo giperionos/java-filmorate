@@ -10,6 +10,8 @@ import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.UnknownFilmException;
 import ru.yandex.practicum.filmorate.exceptions.UnknownUserException;
 
+import javax.validation.ValidationException;
+
 @RestControllerAdvice
 @Slf4j
 public class ErrorHandler {
@@ -30,6 +32,12 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public String handleUnexpectedError(Exception exception) {
         log.error(exception.toString());
+        return exception.getMessage();
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String handleNullPointerException (final ValidationException exception) {
         return exception.getMessage();
     }
 }
