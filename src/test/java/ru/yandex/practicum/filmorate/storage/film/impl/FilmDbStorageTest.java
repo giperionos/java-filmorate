@@ -138,7 +138,7 @@ class FilmDbStorageTest {
         //пусть у фильма 2 не будет лайков
 
         //получить список популярных
-        List<Film> popularFilms = filmDbStorage.getMostPopularList(10L);
+        List<Film> popularFilms = filmDbStorage.getMostPopularList(10L, null, null);
 
         //Должны фильмы в порядке: 3 1 2
         assertEquals(film3.getId(), popularFilms.get(0).getId(), "Ожидаемый фильм не находится в нужной позиции списка.");
@@ -147,7 +147,8 @@ class FilmDbStorageTest {
 
 
         //проверить ограничения на выдачу кол-во элементов списка
-        List<Film> popular2Films = filmDbStorage.getMostPopularList(2L);
+        List<Film> popular2Films = filmDbStorage.getMostPopularList(2L, null, null);
         assertEquals(2, popular2Films.size(), "Количество элементов списка не совпадает с ожидаемым.");
     }
+
 }
