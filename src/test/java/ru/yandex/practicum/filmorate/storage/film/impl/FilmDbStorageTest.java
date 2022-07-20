@@ -15,6 +15,7 @@ import ru.yandex.practicum.filmorate.storage.user.impl.UserDbStorage;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -141,7 +142,7 @@ class FilmDbStorageTest {
         //пусть у фильма 2 не будет лайков
 
         //получить список популярных
-        List<Film> popularFilms = filmDbStorage.getMostPopularList(10L, null, null);
+        List<Film> popularFilms = filmDbStorage.getMostPopularList(10L, Optional.empty(), Optional.empty());
 
         //Должны фильмы в порядке: 3 1 2
         assertEquals(film3.getId(), popularFilms.get(0).getId(), "Ожидаемый фильм не находится в нужной позиции списка.");
@@ -150,7 +151,7 @@ class FilmDbStorageTest {
 
 
         //проверить ограничения на выдачу кол-во элементов списка
-        List<Film> popular2Films = filmDbStorage.getMostPopularList(2L, null, null);
+        List<Film> popular2Films = filmDbStorage.getMostPopularList(2L, Optional.empty(), Optional.empty());
         assertEquals(2, popular2Films.size(), "Количество элементов списка не совпадает с ожидаемым.");
     }
 
