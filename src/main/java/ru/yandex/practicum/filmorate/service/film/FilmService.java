@@ -128,6 +128,7 @@ public class FilmService {
     public Collection<Film> getRecomendations(Long userId) {
         final Collection<Film> films = filmStorage.getRecomendations(userId);
         films.forEach(this::fillGenreForFilm);
+        films.forEach(this::fillDirectorForFilm);
         return films;
     }
 
