@@ -37,7 +37,8 @@ public class FilmService {
                        FilmGenreStorage filmGenreStorage,
                        GenreStorage genreStorage,
                        DirectorStorage directorStorage,
-                       FilmDirectorStorage filmDirectorStorage, UserStorage userStorage, LikeStorage likeStorage)
+                       FilmDirectorStorage filmDirectorStorage,
+                       UserStorage userStorage)
     {
         this.filmStorage = filmStorage;
         this.ratingStorage = ratingStorage;
@@ -290,13 +291,8 @@ public class FilmService {
     }
 
     public List<Film> getCommonFilms(Long userId, Long friendId) {
-        if(userStorage.getById(userId) == null) {
-            throw new UnknownUserException(String.format("Пользователь с id = %d не найден в хранилище.", userId));
-        }
-        if(userStorage.getById(friendId) == null) {
-            throw new UnknownUserException(String.format("Пользователь с id = %d не найден в хранилище.", friendId));
-        }
+        userStorage.getById(userId);
+        userStorage.getById(friendId);
         return filmStorage.getCommonFilmsByRating(userId, friendId);
-
     }
 }
