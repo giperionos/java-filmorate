@@ -3,16 +3,18 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.model.Event;
+import ru.yandex.practicum.filmorate.model.EventType;
+import ru.yandex.practicum.filmorate.model.Operation;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.event.EventService;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
-import ru.yandex.practicum.filmorate.service.like.LikeService;
 import ru.yandex.practicum.filmorate.service.user.UserService;
 
 import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
-
 
 @RestController
 @RequestMapping("/users")
@@ -21,11 +23,15 @@ public class UserController {
 
     private final UserService userService;
     private final FilmService filmService;
+    private final EventService eventService;
+
+    private static final EventType EVENT_FRIEND = EventType.of(3, "FRIEND");
 
     @Autowired
-    public UserController(UserService userService, FilmService filmService) {
+    public UserController(UserService userService, FilmService filmService, EventService eventService) {
         this.userService = userService;
         this.filmService = filmService;
+        this.eventService = eventService;
     }
 
     @PostMapping
@@ -60,11 +66,24 @@ public class UserController {
     @PutMapping("/{id}/friends/{friendId}")
     public void addToFriends(@PathVariable("id") Long userId, @PathVariable Long friendId) {
         userService.addToFriends(userId, friendId);
+        eventService.add(Event.of(
+                friendId,
+                userId,
+                EVENT_FRIEND,
+                Operation.of(2, "ADD"))
+        );
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
     public void removeFromFriends(@PathVariable("id") Long userId, @PathVariable Long friendId) {
         userService.removeFromFriends(userId, friendId);
+        eventService.add(Event.of(
+                friendId,
+                userId,
+                EVENT_FRIEND,
+                Operation.of(1, "REMOVE"))
+        );
+
     }
 
     @GetMapping("/{id}/friends")
@@ -81,6 +100,11 @@ public class UserController {
     public void removeUserById(@PathVariable Long id) {
         log.debug(String.format("Обработка DELETE запроса по пути /users на удаление пользователя id=%d", id));
         userService.removeUserById(id);
+    }
+
+    @GetMapping("/{id}/feed")
+    public Collection<Event> getEventByUserId(@PathVariable Long id) {
+       return eventService.getByUserId(id);
     }
 
     @GetMapping("/{id}/recommendations")
