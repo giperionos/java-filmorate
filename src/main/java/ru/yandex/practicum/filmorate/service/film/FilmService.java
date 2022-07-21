@@ -291,8 +291,22 @@ public class FilmService {
     }
 
     public List<Film> getCommonFilms(Long userId, Long friendId) {
-        userStorage.getById(userId);
-        userStorage.getById(friendId);
+        //Сначала нужно убедиться, есть ли такие пользователи
+
+        try {
+            userStorage.getById(userId);
+        } catch (EntityNotFoundException e) {
+            log.warn("Пришел неизвестный пользователь с id = " + userId);
+            throw e;
+        }
+
+        try {
+            userStorage.getById(friendId);
+        } catch (EntityNotFoundException e) {
+            log.warn("Пришел неизвестный пользователь с id = " + friendId);
+            throw e;
+        }
+
         return filmStorage.getCommonFilmsByRating(userId, friendId);
     }
 }
