@@ -18,7 +18,7 @@ public interface FilmStorage extends Storage<Film> {
 
     List<Film> getFilmsForDirectorSortedByYearsAndLikes(Integer directorId);
 
-    Collection<Film> getRecomendations(Long userId);
+    Collection<Film> getRecommendations(Long userId);
 
     List<Film> getFilmsByQuery(String query, String by);
 
