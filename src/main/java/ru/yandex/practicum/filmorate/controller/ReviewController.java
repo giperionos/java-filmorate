@@ -4,7 +4,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.model.Event;
+import ru.yandex.practicum.filmorate.model.EventType;
+import ru.yandex.practicum.filmorate.model.Operation;
 import ru.yandex.practicum.filmorate.model.Review;
+import ru.yandex.practicum.filmorate.service.event.EventService;
 import ru.yandex.practicum.filmorate.service.review.ReviewService;
 
 import javax.validation.Valid;
@@ -17,26 +21,52 @@ import java.util.List;
 public class ReviewController {
 
     private final ReviewService reviewService;
+    private final EventService eventService;
+
+    private static final EventType EVENT_REVIEW = EventType.of(2, "REVIEW");
 
     @Autowired
-    public ReviewController(ReviewService reviewService) {
+    public ReviewController(ReviewService reviewService, EventService eventService) {
         this.reviewService = reviewService;
+        this.eventService = eventService;
     }
 
     @PostMapping
     public Review addNewReview(@Valid @RequestBody Review review){
+        final Review addedReview = reviewService.addNewReview(review);
         log.debug("Добавление POST запроса /reviews");
-        return reviewService.addNewReview(review);
+        eventService.add(Event.of(
+                addedReview.getReviewId(),
+                addedReview.getUserId(),
+                EVENT_REVIEW,
+                Operation.of(2, "ADD"))
+        );
+
+        return addedReview;
     }
 
     @PutMapping
     public Review updateReview (@Valid @RequestBody Review review) {
+        final Review updatedReview = reviewService.updateReview(review);
         log.debug("Добавление PUT запроса /reviews");
-        return reviewService.updateReview(review);
+        eventService.add(Event.of(
+                updatedReview.getReviewId(),
+                updatedReview.getUserId(),
+                EVENT_REVIEW,
+                Operation.of(3, "UPDATE"))
+        );
+        return updatedReview;
     }
 
     @DeleteMapping("/{id}")
     public void deleteReview(@PathVariable Long id) {
+        eventService.add(Event.of(
+                id,
+                reviewService.getReviewById(id).getUserId(),
+                EVENT_REVIEW,
+                Operation.of(1, "REMOVE"))
+        );
+
         reviewService.deleteReview(id);
     }
 
@@ -74,5 +104,4 @@ public class ReviewController {
     public void  deleteDislikeReview(@PathVariable Long id, @PathVariable Long userId){
         reviewService.deleteDislikeReview(id, userId);
     }
-
 }

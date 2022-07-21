@@ -3,7 +3,11 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.model.Event;
+import ru.yandex.practicum.filmorate.model.EventType;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Operation;
+import ru.yandex.practicum.filmorate.service.event.EventService;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
 import ru.yandex.practicum.filmorate.service.like.LikeService;
 
@@ -18,11 +22,15 @@ public class FilmController {
 
     private final FilmService filmService;
     private final LikeService likeService;
+    private final EventService eventService;
+
+    private static final EventType EVENT_LIKE = EventType.of(1, "LIKE");
 
     @Autowired
-    public FilmController(FilmService filmService, LikeService likeService) {
+    public FilmController(FilmService filmService, LikeService likeService, EventService eventService) {
         this.filmService = filmService;
         this.likeService = likeService;
+        this.eventService = eventService;
     }
 
     @PostMapping
@@ -56,11 +64,23 @@ public class FilmController {
     @PutMapping("/{id}/like/{userId}")
     public void putLike(@PathVariable Long id, @PathVariable Long userId) {
         likeService.addLike(id, userId);
+        eventService.add(Event.of(
+                id,
+                userId,
+                EVENT_LIKE,
+                Operation.of(2, "ADD"))
+        );
     }
 
     @DeleteMapping("/{id}/like/{userId}")
     public void deleteLike(@PathVariable Long id, @PathVariable Long userId) {
         likeService.removeLike(id, userId);
+        eventService.add(Event.of(
+                id,
+                userId,
+                EVENT_LIKE,
+                Operation.of(1, "REMOVE"))
+        );
     }
 
     @GetMapping("/popular") //?count={count}
