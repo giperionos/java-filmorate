@@ -6,13 +6,16 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.UnknownFilmException;
+import ru.yandex.practicum.filmorate.exceptions.UnknownUserException;
 import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmDirectorStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmGenreStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
+import ru.yandex.practicum.filmorate.storage.like.LikeStorage;
 import ru.yandex.practicum.filmorate.storage.rating.RatingStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.*;
 
@@ -26,6 +29,7 @@ public class FilmService {
     private final GenreStorage genreStorage;
     private final DirectorStorage directorStorage;
     private final FilmDirectorStorage filmDirectorStorage;
+    private final UserStorage userStorage;
 
     @Autowired
     public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage,
@@ -33,7 +37,7 @@ public class FilmService {
                        FilmGenreStorage filmGenreStorage,
                        GenreStorage genreStorage,
                        DirectorStorage directorStorage,
-                       FilmDirectorStorage filmDirectorStorage)
+                       FilmDirectorStorage filmDirectorStorage, UserStorage userStorage, LikeStorage likeStorage)
     {
         this.filmStorage = filmStorage;
         this.ratingStorage = ratingStorage;
@@ -41,6 +45,7 @@ public class FilmService {
         this.genreStorage = genreStorage;
         this.directorStorage = directorStorage;
         this.filmDirectorStorage = filmDirectorStorage;
+        this.userStorage = userStorage;
     }
 
     public Film add(Film film) {
@@ -282,5 +287,16 @@ public class FilmService {
         }
 
         return sortedFilms;
+    }
+
+    public List<Film> getCommonFilms(Long userId, Long friendId) {
+        if(userStorage.getById(userId) == null) {
+            throw new UnknownUserException(String.format("Пользователь с id = %d не найден в хранилище.", userId));
+        }
+        if(userStorage.getById(friendId) == null) {
+            throw new UnknownUserException(String.format("Пользователь с id = %d не найден в хранилище.", friendId));
+        }
+        return filmStorage.getCommonFilmsByRating(userId, friendId);
+
     }
 }

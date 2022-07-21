@@ -310,4 +310,25 @@ public class FilmDbStorage implements FilmStorage {
 
         return jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> mapRowToFilm(rs)), query);
     }
+
+    public List<Film> getCommonFilmsByRating(Long userId, Long friendId){
+        String sqlQuery = "SELECT " +
+                "f.FILM_ID, " +
+                "f.FILM_NAME, " +
+                "f.FILM_DESCRIPTION, " +
+                "f.RELEASE_DATE, " +
+                "f.DURATION, " +
+                "mp.RATING_ID, " +
+                "mp.RATING_NAME, " +
+                "mp.RATING_DESCRIPTION " +
+                "from FILM AS f " +
+                "LEFT JOIN RATING_MPA as mp on f.RATING_MPA_ID = mp.RATING_ID " +
+                "LEFT JOIN \"LIKE\" L on f.FILM_ID = L.FILM_ID" +
+                " where f.FILM_ID in " +
+                "(select FILM_ID from \"LIKE\" " +
+                "where USER_ID = ? and FILM_ID in " +
+                "(select FILM_ID from \"LIKE\" where USER_ID = ?)) " +
+                "group by L.FILM_ID order by count(L.USER_ID) desc";
+        return jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> mapRowToFilm(rs)), friendId, userId);
+    }
 }
