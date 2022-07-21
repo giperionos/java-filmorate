@@ -175,7 +175,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public Collection<Film> getRecomendations(Long userId) {
+    public Collection<Film> getRecommendations(Long userId) {
         final String sqlQuery = "select\n" +
                 "    FILM_ID\n" +
                 "from \"LIKE\" as L\n" +
