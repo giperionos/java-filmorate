@@ -1,31 +1,26 @@
 package ru.yandex.practicum.filmorate.storage.review.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.review.ReviewStorage;
 
-import java.lang.reflect.InvocationTargetException;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
 @Component
-public class ReviewDBStorage implements ReviewStorage {
+public class ReviewStorageDbImpl implements ReviewStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public ReviewDBStorage(JdbcTemplate jdbcTemplate) {
+    public ReviewStorageDbImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -46,9 +41,9 @@ public class ReviewDBStorage implements ReviewStorage {
                 return stmt;
             }, keyHolder);
 
-            final long id = keyHolder.getKey().longValue();
-            review.setReviewId(id);
-            return getReviewById(id);
+            final long reviewId = keyHolder.getKey().longValue();
+            review.setReviewId(reviewId);
+            return getReviewById(reviewId);
 
 
     }
@@ -74,21 +69,21 @@ public class ReviewDBStorage implements ReviewStorage {
     }
 
     @Override
-    public void deleteReview(long id) {
+    public void deleteReview(Long reviewId) {
         String sqlQuery = "delete from REVIEW where REVIEW_ID = ?";
 
-        boolean deleting = jdbcTemplate.update(sqlQuery, id) > 0;
+        boolean deleting = jdbcTemplate.update(sqlQuery, reviewId) > 0;
         if (!deleting){
-            throw new EntityNotFoundException(String.format("Сущность с id %d не найдена в таблице REVIEW:", id));
+            throw new EntityNotFoundException(String.format("Сущность с reviewId %d не найдена в таблице REVIEW:", reviewId));
         }
     }
 
     @Override
-    public Review getReviewById(long id) {
+    public Review getReviewById(Long reviewId) {
         String sqlQuery = "select * from REVIEW where REVIEW_ID = ?";
-        List<Review> reviewes = jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> makeReview(rs)), id);
+        List<Review> reviewes = jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> makeReview(rs)), reviewId);
         if (reviewes.size() != 1) {
-            throw new EntityNotFoundException(String.format("Сущность с %d не найдена в таблице REVIEW:", id));
+            throw new EntityNotFoundException(String.format("Сущность с %d не найдена в таблице REVIEW:", reviewId));
         }
         return reviewes.get(0);
     }
@@ -106,35 +101,35 @@ public class ReviewDBStorage implements ReviewStorage {
     }
 
     @Override
-    public void addLike(Long id) {
+    public void addLike(Long reviewId) {
         String sqlQuery = "update REVIEW set USEFUL = USEFUL + ? "
                 + " where REVIEW_ID = ?";
 
-        int isUpdated = jdbcTemplate.update(sqlQuery,1, id);
+        int isUpdated = jdbcTemplate.update(sqlQuery,1, reviewId);
     }
 
     @Override
-    public void addDislike(Long id) {
+    public void addDislike(Long reviewId) {
         String sqlQuery = "update REVIEW set USEFUL = USEFUL - ? "
                 + " where REVIEW_ID = ?";
 
-        jdbcTemplate.update(sqlQuery,1, id);
+        jdbcTemplate.update(sqlQuery,1, reviewId);
     }
 
     @Override
-    public void deleteLike(Long id) {
+    public void deleteLike(Long reviewId) {
         String sqlQuery = "update REVIEW set USEFUL = USEFUL - ? "
                 + " where REVIEW_ID = ?";
 
-        jdbcTemplate.update(sqlQuery,1, id);
+        jdbcTemplate.update(sqlQuery,1, reviewId);
     }
 
     @Override
-    public void deleteDislike(Long id) {
+    public void deleteDislike(Long reviewId) {
         String sqlQuery = "update REVIEW set USEFUL = USEFUL + ? "
                 + " where REVIEW_ID = ?";
 
-        jdbcTemplate.update(sqlQuery,1, id);
+        jdbcTemplate.update(sqlQuery,1, reviewId);
     }
 
     private Review makeReview(ResultSet rs) throws SQLException {

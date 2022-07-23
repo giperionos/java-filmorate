@@ -15,17 +15,17 @@ import java.sql.SQLException;
 import java.util.List;
 
 @Component
-public class DirectorStorageImpl implements DirectorStorage {
+public class DirectorStorageDbImpl implements DirectorStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public DirectorStorageImpl(JdbcTemplate jdbcTemplate) {
+    public DirectorStorageDbImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
-    public List<Director> getAll() {
+    public List<Director> getAllDirectors() {
 
         String sqlQuery = "select * from DIRECTOR order by DIRECTOR_ID asc;";
 
@@ -33,20 +33,20 @@ public class DirectorStorageImpl implements DirectorStorage {
     }
 
     @Override
-    public Director getById(Integer id) {
+    public Director getDirectorById(Integer directorId) {
         String sqlQuery = "select * from DIRECTOR where DIRECTOR_ID = ?;";
 
-        List<Director> directors = jdbcTemplate.query(sqlQuery, (((rs, rowNum) -> mapRowToDirector(rs))), id);
+        List<Director> directors = jdbcTemplate.query(sqlQuery, (((rs, rowNum) -> mapRowToDirector(rs))), directorId);
 
         if (directors.size() != 1) {
-            throw new EntityNotFoundException(String.format("Сущность с %d не найдена в таблице DIRECTOR.", id));
+            throw new EntityNotFoundException(String.format("Сущность с %d не найдена в таблице DIRECTOR.", directorId));
         }
 
         return directors.get(0);
     }
 
     @Override
-    public Director add(Director director) {
+    public Director addNewDirector(Director director) {
         String sqlQuery = "insert into DIRECTOR (DIRECTOR_NAME) values (?);";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -63,7 +63,7 @@ public class DirectorStorageImpl implements DirectorStorage {
     }
 
     @Override
-    public Director update(Director director) {
+    public Director updateDirector(Director director) {
 
         String sqlQuery = "update DIRECTOR set DIRECTOR_NAME = ? where DIRECTOR_ID = ?;";
 
@@ -80,11 +80,11 @@ public class DirectorStorageImpl implements DirectorStorage {
     }
 
     @Override
-    public void deleteById(Integer id) {
+    public void deleteDirectorById(Integer directorId) {
         String sqlQuery = "delete from DIRECTOR where DIRECTOR_ID = ?";
 
-        if (jdbcTemplate.update(sqlQuery, id) == 0) {
-            throw new EntityNotFoundException(String.format("Сущность DIRECTOR с id=%d не найдена в таблице DIRECTOR.", id));
+        if (jdbcTemplate.update(sqlQuery, directorId) == 0) {
+            throw new EntityNotFoundException(String.format("Сущность DIRECTOR с directorId=%d не найдена в таблице DIRECTOR.", directorId));
         }
     }
 

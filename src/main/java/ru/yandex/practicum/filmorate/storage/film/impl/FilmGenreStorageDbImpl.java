@@ -12,36 +12,36 @@ import java.sql.SQLException;
 import java.util.List;
 
 @Component
-public class FilmGenreStorageImpl implements FilmGenreStorage {
+public class FilmGenreStorageDbImpl implements FilmGenreStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public FilmGenreStorageImpl(JdbcTemplate jdbcTemplate) {
+    public FilmGenreStorageDbImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
-    public void add(Long filmId, Integer genreId) {
+    public void addNewFilmGenreLink(Long filmId, Integer genreId) {
         String sqlQuery = "insert into FILM_GENRE (FILM_ID, GENRE_ID) VALUES ( ?, ? )";
 
         jdbcTemplate.update(sqlQuery, filmId, genreId);
     }
 
     @Override
-    public boolean deleteByFilmId(Long id) {
+    public boolean deleteFilmGenreLinksByFilmId(Long filmId) {
         String sqlQuery = "delete from FILM_GENRE where FILM_ID = ?";
-        return jdbcTemplate.update(sqlQuery, id) > 0;
+        return jdbcTemplate.update(sqlQuery, filmId) > 0;
     }
 
     @Override
-    public List<FilmGenre> getByFilmId(Long id) {
+    public List<FilmGenre> getFilmGenreLinksByFilmId(Long filmId) {
         String sqlQuery = "select * from FILM_GENRE where FILM_ID = ?";
-        return  jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> mapRowToFilmGenre(rs)), id);
+        return  jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> mapRowToFilmGenre(rs)), filmId);
     }
 
     @Override
-    public List<FilmGenre> getAll() {
+    public List<FilmGenre> getAllFilmGenreLinks() {
         String sqlQuery = "select * from FILM_GENRE";
         return jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> mapRowToFilmGenre(rs)));
     }

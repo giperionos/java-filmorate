@@ -6,7 +6,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.UnknownUserException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
@@ -17,17 +16,17 @@ import java.util.List;
 
 @Component
 @Qualifier("userDbStorage")
-public class UserDbStorage implements UserStorage {
+public class UserStorageDbImpl implements UserStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public UserDbStorage(JdbcTemplate jdbcTemplate) {
+    public UserStorageDbImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
-    public User add(User entity) {
+    public User addNewUser(User entity) {
         String sqlQuery = "insert into \"USER\" (EMAIL, LOGIN, USER_NAME, BIRTHDAY) VALUES ( ?, ?, ?, ? )";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -52,7 +51,7 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public User update(User entity) {
+    public User updateUser(User entity) {
         String sqlQuery = "update \"USER\" set EMAIL = ?, LOGIN = ?, USER_NAME = ?, BIRTHDAY = ? where USER_ID = ?";
 
         int isUpdated = jdbcTemplate.update(sqlQuery
@@ -64,26 +63,26 @@ public class UserDbStorage implements UserStorage {
         );
 
         if (isUpdated == 0) {
-            throw new EntityNotFoundException(String.format("Сущность с %d не найдена в хранилище.", entity.getId()));
+            throw new UnknownUserException(String.format("Пользователь с %d не найден в таблице USER", entity.getId()));
         }
 
         return entity;
     }
 
     @Override
-    public List<User> getAll() {
+    public List<User> getAllUsers() {
         String sqlQuery = "select USER_ID, EMAIL, LOGIN, USER_NAME, BIRTHDAY from \"USER\"";
 
         return jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> mapRowToUser(rs)));
     }
 
     @Override
-    public User getById(Long id) {
+    public User getUserById(Long userId) {
         String sqlQuery = "select USER_ID, EMAIL, LOGIN, USER_NAME, BIRTHDAY from \"USER\" where USER_ID = ?";
-        List<User> users = jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> mapRowToUser(rs)), id);
+        List<User> users = jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> mapRowToUser(rs)), userId);
 
         if (users.size() != 1) {
-            throw new EntityNotFoundException(String.format("Сущность с %d не найдена в таблице USER:", id));
+            throw new UnknownUserException(String.format("Пользователь с %d не найден в таблице USER", userId));
         }
 
         return users.get(0);
@@ -106,10 +105,10 @@ public class UserDbStorage implements UserStorage {
         );
     }
 
-    public void deleteById(Long id) {
+    public void deleteUserById(Long userId) {
         String sqlQuery = "delete from \"USER\" where USER_ID = ?";
-        if (jdbcTemplate.update(sqlQuery, id) == 0) {
-            throw new UnknownUserException(String.format("Сущность с id=%d не найдена в таблице USER:", id));
+        if (jdbcTemplate.update(sqlQuery, userId) == 0) {
+            throw new UnknownUserException(String.format("Сущность с userId=%d не найдена в таблице USER:", userId));
         }
     }
 }

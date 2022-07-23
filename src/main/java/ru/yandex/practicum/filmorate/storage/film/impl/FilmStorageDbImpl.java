@@ -8,7 +8,6 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.UnknownFilmException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.MPARating;
@@ -20,19 +19,19 @@ import java.util.*;
 
 @Component
 @Qualifier("filmDbStorage")
-public class FilmDbStorage implements FilmStorage {
+public class FilmStorageDbImpl implements FilmStorage {
 
     private final JdbcTemplate jdbcTemplate;
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     @Autowired
-    public FilmDbStorage(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+    public FilmStorageDbImpl(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
         this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
-    public Film add(Film entity) {
+    public Film addNewFilm(Film entity) {
         String sqlQuery = "insert into FILM (FILM_NAME, FILM_DESCRIPTION, RELEASE_DATE, DURATION, RATING_MPA_ID) " +
                 "VALUES ( ?, ?, ?, ?, ? )";
 
@@ -53,7 +52,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public Film update(Film entity) {
+    public Film updateFilm(Film entity) {
         String sqlQuery = "update FILM set FILM_NAME = ?, FILM_DESCRIPTION = ?, RELEASE_DATE = ?, DURATION = ?, RATING_MPA_ID = ?"
                 + " where FILM_ID = ?";
 
@@ -67,14 +66,14 @@ public class FilmDbStorage implements FilmStorage {
         );
 
         if (isUpdated == 0) {
-            throw new EntityNotFoundException(String.format("Сущность с %d не найдена в хранилище.", entity.getId()));
+            throw new UnknownFilmException(String.format("Фильм с %d не найден в таблице FILM.", entity.getId()));
         }
 
         return entity;
     }
 
     @Override
-    public List<Film> getAll() {
+    public List<Film> getAllFilms() {
         String sqlQuery = "select\n" +
                 "    F.FILM_ID,\n" +
                 "    F.FILM_NAME,\n" +
@@ -93,7 +92,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public Film getById(Long id) {
+    public Film getFilmById(Long filmId) {
         String sqlQuery = "select\n" +
                 "    F.FILM_ID,\n" +
                 "    F.FILM_NAME,\n" +
@@ -108,10 +107,10 @@ public class FilmDbStorage implements FilmStorage {
                 "LEFT JOIN RATING_MPA RM on RM.RATING_ID = F.RATING_MPA_ID\n" +
                 "WHERE F.FILM_ID = ?;";
 
-        List<Film> films = jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> mapRowToFilm(rs)), id);
+        List<Film> films = jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> mapRowToFilm(rs)), filmId);
 
         if (films.size() != 1) {
-            throw new EntityNotFoundException(String.format("Сущность с %d не найдена в таблице FILM:", id));
+            throw new UnknownFilmException(String.format("Фильм с %d не найден в таблице FILM.", filmId));
         }
 
         return films.get(0);
@@ -123,7 +122,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> getMostPopularList(Long count, Optional<Integer> genreId, Optional<Integer> year) {
+    public List<Film> getMostPopularFilmsList(Long count, Optional<Integer> genreId, Optional<Integer> year) {
         MapSqlParameterSource sqlQueryParams = new MapSqlParameterSource();
         sqlQueryParams.addValue("limit", count);
         String sqlQuery = "select\n" +
@@ -167,10 +166,10 @@ public class FilmDbStorage implements FilmStorage {
         return namedParameterJdbcTemplate.query(sqlQuery, sqlQueryParams, (rs, rowNum) -> mapRowToFilm(rs));
     }
 
-    public void deleteById(Long id) {
+    public void deleteFilmById(Long filmId) {
         String sqlQuery = "delete from FILM where FILM_ID = ?";
-        if (jdbcTemplate.update(sqlQuery, id) == 0) {
-            throw new UnknownFilmException(String.format("Сущность с id=%d не найдена в таблице FILM:", id));
+        if (jdbcTemplate.update(sqlQuery, filmId) == 0) {
+            throw new UnknownFilmException(String.format("Сущность с id=%d не найдена в таблице FILM:", filmId));
         }
     }
 
@@ -199,7 +198,7 @@ public class FilmDbStorage implements FilmStorage {
                 "    where USER_ID = ?\n" +
                 "    )";
 
-        return jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> getById(rs.getLong("FILM_ID"))), userId, userId, userId);
+        return jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> getFilmById(rs.getLong("FILM_ID"))), userId, userId, userId);
     }
 
     //likes
@@ -282,7 +281,7 @@ public class FilmDbStorage implements FilmStorage {
         return jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> mapRowToFilm(rs)), directorId);
     }
 
-    public List<Film> getFilmsByQuery(String query, String by) {
+    public List<Film> getFilmsByQuery(String query, String queryParam) {
         final String sqlQuery =
                 "SELECT " +
                 "    FR.*, " +
@@ -305,7 +304,7 @@ public class FilmDbStorage implements FilmStorage {
                 "    FROM \"LIKE\" " +
                 "    GROUP BY FILM_ID " +
                 "    ) L ON F.FILM_ID = L.FILM_ID " +
-                "WHERE CONCAT_WS('|', " + by + " , '|') ILIKE CONCAT('%',?,'%') " +
+                "WHERE CONCAT_WS('|', " + queryParam + " , '|') ILIKE CONCAT('%',?,'%') " +
                 "ORDER BY LIKES DESC";
 
         return jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> mapRowToFilm(rs)), query);

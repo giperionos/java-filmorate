@@ -35,36 +35,36 @@ public class UserController {
     }
 
     @PostMapping
-    public User add(@Valid @RequestBody User user) {
+    public User addNewUser(@Valid @RequestBody User user) {
         log.debug("Обработка POST запроса по пути /users на добавление пользователя.");
         log.debug("Пришел объект: " + user);
         log.debug("Пользователь: " + user + "сохранен и передан клиенту.");
 
-        return userService.add(user);
+        return userService.addNewUser(user);
     }
 
     @PutMapping
-    public User update(@Valid @RequestBody User user) {
+    public User updateUser(@Valid @RequestBody User user) {
         log.debug("Обработка PUT запроса по пути /users на обновление фильма.");
         log.debug("Пришел объект: " + user);
 
         //и вернуть его
         log.debug("Фильм: " + user + " обновлен и передан клиенту.");
-        return userService.update(user);
+        return userService.updateUser(user);
     }
 
     @GetMapping
-    public List<User> getAll(){
-        return userService.getAll();
+    public List<User> getAllUsers(){
+        return userService.getAllUsers();
     }
 
-    @GetMapping("/{id}")
-    public User getUserById(@PathVariable Long id) {
-        return userService.getUserById(id);
+    @GetMapping("/{userId}")
+    public User getUserById(@PathVariable Long userId) {
+        return userService.getUserById(userId);
     }
 
-    @PutMapping("/{id}/friends/{friendId}")
-    public void addToFriends(@PathVariable("id") Long userId, @PathVariable Long friendId) {
+    @PutMapping("/{userId}/friends/{friendId}")
+    public void addToFriends(@PathVariable Long userId, @PathVariable Long friendId) {
         userService.addToFriends(userId, friendId);
         eventService.add(Event.of(
                 friendId,
@@ -74,8 +74,8 @@ public class UserController {
         );
     }
 
-    @DeleteMapping("/{id}/friends/{friendId}")
-    public void removeFromFriends(@PathVariable("id") Long userId, @PathVariable Long friendId) {
+    @DeleteMapping("/{userId}/friends/{friendId}")
+    public void removeFromFriends(@PathVariable Long userId, @PathVariable Long friendId) {
         userService.removeFromFriends(userId, friendId);
         eventService.add(Event.of(
                 friendId,
@@ -86,29 +86,29 @@ public class UserController {
 
     }
 
-    @GetMapping("/{id}/friends")
-    public List<User> getAllUserFriends(@PathVariable Long id) {
-        return userService.getAllUserFriends(id);
+    @GetMapping("/{userId}/friends")
+    public List<User> getAllUserFriendsByUserId(@PathVariable Long userId) {
+        return userService.getAllUserFriendsByUserId(userId);
     }
 
-    @GetMapping("/{id}/friends/common/{otherId}")
-    public List<User> getCommonUserFriends(@PathVariable Long id, @PathVariable Long otherId) {
-        return userService.getCommonUserFriends(id, otherId);
+    @GetMapping("/{userId}/friends/common/{otherId}")
+    public List<User> getCommonUserFriends(@PathVariable Long userId, @PathVariable Long otherId) {
+        return userService.getCommonUserFriends(userId, otherId);
     }
 
-    @DeleteMapping("/{id}")
-    public void removeUserById(@PathVariable Long id) {
-        log.debug(String.format("Обработка DELETE запроса по пути /users на удаление пользователя id=%d", id));
-        userService.removeUserById(id);
+    @DeleteMapping("/{userId}")
+    public void removeUserById(@PathVariable Long userId) {
+        log.debug(String.format("Обработка DELETE запроса по пути /users на удаление пользователя с id=%d", userId));
+        userService.removeUserById(userId);
     }
 
-    @GetMapping("/{id}/feed")
-    public Collection<Event> getEventByUserId(@PathVariable Long id) {
-       return eventService.getByUserId(id);
+    @GetMapping("/{userId}/feed")
+    public Collection<Event> getEventByUserId(@PathVariable Long userId) {
+       return eventService.getByUserId(userId);
     }
 
-    @GetMapping("/{id}/recommendations")
-    public Collection<Film> getRecommendations(@PathVariable Long id) {
-        return filmService.getRecommendations(id);
+    @GetMapping("/{userId}/recommendations")
+    public Collection<Film> getRecommendations(@PathVariable Long userId) {
+        return filmService.getRecommendations(userId);
     }
 }

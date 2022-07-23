@@ -23,13 +23,13 @@ public class RatingController {
         this.ratingService = ratingService;
     }
 
-    @GetMapping("/{id}")
-    public MPARating getById(@PathVariable Integer id) {
-        return ratingService.getById(id);
+    @GetMapping("/{ratingMpaId}")
+    public MPARating getByMPARatingId(@PathVariable Integer ratingMpaId) {
+        return ratingService.getByMPARatingId(ratingMpaId);
     }
 
     @GetMapping
-    public List<MPARating> getAll() {
-        return ratingService.getAll();
+    public List<MPARating> getAllMPARatings() {
+        return ratingService.getAllMPARatings();
     }
 }

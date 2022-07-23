@@ -13,10 +13,10 @@ import java.util.*;
 @Getter
 @Setter
 @ToString
-public class Film extends Entity {
+public class Film {
 
     public Film(Long id, String name, String description, LocalDate releaseDate, Integer duration, MPARating mpa, Set<Genre> genres, Set<Director> directors) {
-        super(id);
+        this.id = id;
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
@@ -27,8 +27,9 @@ public class Film extends Entity {
     }
 
     public Film() {
-        super(null);
     }
+
+    private Long id;
 
     @NotBlank(message = "Название фильма не должно быть пустым.")
     private String name;
@@ -54,7 +55,8 @@ public class Film extends Entity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Film film = (Film) o;
-        return name.equals(film.name)
+        return id.longValue() == film.getId().longValue()
+                && name.equals(film.name)
                 && description.equals(film.description)
                 && releaseDate.equals(film.releaseDate)
                 && duration.longValue() == film.duration.longValue()
@@ -63,6 +65,6 @@ public class Film extends Entity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, releaseDate, duration, mpa.getId());
+        return Objects.hash(id.longValue(), name, description, releaseDate, duration, mpa.getId().intValue());
     }
 }

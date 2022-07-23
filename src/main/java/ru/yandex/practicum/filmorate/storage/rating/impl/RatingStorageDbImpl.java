@@ -12,27 +12,27 @@ import java.sql.SQLException;
 import java.util.List;
 
 @Component
-public class RatingStorageImpl implements RatingStorage {
+public class RatingStorageDbImpl implements RatingStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public RatingStorageImpl(JdbcTemplate jdbcTemplate) {
+    public RatingStorageDbImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
-    public MPARating getById(Integer id) {
+    public MPARating getRatingMpaById(Integer ratingMpaId) {
         String sqlQuery = "select * from RATING_MPA where RATING_ID = ?";
-        List<MPARating> ratings = jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> mapRowToRatingMPA(rs)), id);
+        List<MPARating> ratings = jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> mapRowToRatingMPA(rs)), ratingMpaId);
         if (ratings.size() != 1) {
-            throw new EntityNotFoundException(String.format("Сущность с %d не найдена в хранилище.", id));
+            throw new EntityNotFoundException(String.format("Сущность с %d не найдена в хранилище.", ratingMpaId));
         }
         return ratings.get(0);
     }
 
     @Override
-    public List<MPARating> getAll() {
+    public List<MPARating> getAllRatingsMpa() {
         String sqlQuery = "select * from RATING_MPA";
         return jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> mapRowToRatingMPA(rs)));
     }

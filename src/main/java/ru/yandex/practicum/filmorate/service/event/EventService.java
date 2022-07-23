@@ -14,11 +14,11 @@ public class EventService {
 
     private final EventStorage eventStorage;
 
-    public Collection<Event> getByUserId(Long id) {
-        return eventStorage.getByUserId(id);
+    public Collection<Event> getByUserId(Long userId) {
+        return eventStorage.getByEventsByUserId(userId);
     }
 
     public void add(Event event) {
-        eventStorage.add(event);
+        eventStorage.addNewEvent(event);
     }
 }

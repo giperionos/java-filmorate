@@ -2,11 +2,11 @@ package ru.yandex.practicum.filmorate.storage.usefulReview;
 
 public interface UsefulReviewStorage {
 
-    boolean addLikeReview(Long id, Long userId);
+    boolean addLikeReview(Long reviewId, Long userId);
 
-    boolean addDislikeReview(Long id, Long userId);
+    boolean addDislikeReview(Long reviewId, Long userId);
 
-    boolean deleteLikeReview(Long id, Long userId);
+    boolean deleteLikeReview(Long reviewId, Long userId);
 
-    boolean deleteDislikeReview(Long id, Long userId);
+    boolean deleteDislikeReview(Long reviewId, Long userId);
 }

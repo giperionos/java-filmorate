@@ -11,37 +11,37 @@ import java.sql.SQLException;
 import java.util.List;
 
 @Component
-public class LikeStorageImpl implements LikeStorage {
+public class LikeStorageDbImpl implements LikeStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public LikeStorageImpl(JdbcTemplate jdbcTemplate) {
+    public LikeStorageDbImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
-    public void add(Long filmId, Long userId) {
+    public void addNewLikeForFilmIdByUserId(Long filmId, Long userId) {
         String sqlQuery = "insert into \"LIKE\" (FILM_ID, USER_ID) VALUES ( ?, ? );";
 
         jdbcTemplate.update(sqlQuery, filmId, userId);
     }
 
     @Override
-    public boolean delete(Long filmId, Long userId) {
+    public boolean deleteLikeForFilmIdByUserId(Long filmId, Long userId) {
         String sqlQuery = "delete from \"LIKE\" where FILM_ID = ? and USER_ID = ?;";
 
         return jdbcTemplate.update(sqlQuery, filmId, userId) > 0;
     }
 
     @Override
-    public List<Like> getAll() {
+    public List<Like> getAllLikes() {
         String sqlQuery = "select * from \"LIKE\"";
         return jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> mapRowToLikes(rs)));
     }
 
     @Override
-    public boolean deleteAll() {
+    public boolean deleteAllLikes() {
         String sqlQuery = "delete from \"LIKE\";";
 
         return jdbcTemplate.update(sqlQuery) > 0;

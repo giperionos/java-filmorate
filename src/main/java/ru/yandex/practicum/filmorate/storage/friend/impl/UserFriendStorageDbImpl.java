@@ -7,42 +7,42 @@ import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.UserFriend;
 import ru.yandex.practicum.filmorate.storage.friend.UserFriendStorage;
-import ru.yandex.practicum.filmorate.storage.user.impl.UserDbStorage;
+import ru.yandex.practicum.filmorate.storage.user.impl.UserStorageDbImpl;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
 @Component
-public class UserFriendStorageImpl implements UserFriendStorage {
+public class UserFriendStorageDbImpl implements UserFriendStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public UserFriendStorageImpl(JdbcTemplate jdbcTemplate) {
+    public UserFriendStorageDbImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
-    public void add(Long ownerUserId, Long friendId) {
+    public void addNewUserFriendLink(Long ownerUserId, Long friendId) {
         String sqlQuery = "insert into USER_FRIEND (OWNER_USER_ID, FRIEND_ID, RELATION_SHIP_STATUS) VALUES ( ?, ?, ?)";
 
         jdbcTemplate.update(sqlQuery,ownerUserId, friendId, "ACCEPTED");
     }
 
     @Override
-    public boolean remove(Long ownerUserId, Long friendId) {
+    public boolean removeUserFriendLinkByUserIdAndFriendId(Long ownerUserId, Long friendId) {
         String sqlQuery = "delete from USER_FRIEND where OWNER_USER_ID = ? and FRIEND_ID = ?";
         return jdbcTemplate.update(sqlQuery, ownerUserId, friendId) > 0;
     }
 
     @Override
-    public List<User> getAllFriendsByOwnerUserId(Long id) {
+    public List<User> getAllFriendsByOwnerUserId(Long ownerUserId) {
         String sqlQuery = "select * from \"USER\" "
                + "LEFT JOIN USER_FRIEND UF on USER_ID = UF.FRIEND_ID "
                + "where UF.OWNER_USER_ID = ?;";
 
-        return jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> UserDbStorage.mapRowToUser(rs)), id);
+        return jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> UserStorageDbImpl.mapRowToUser(rs)), ownerUserId);
     }
 
     @Override
@@ -57,22 +57,22 @@ public class UserFriendStorageImpl implements UserFriendStorage {
                 ");";
 
 
-        return jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> UserDbStorage.mapRowToUser(rs)), ownerId, otherId);
+        return jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> UserStorageDbImpl.mapRowToUser(rs)), ownerId, otherId);
     }
 
     @Override
-    public List<UserFriend> getAll() {
+    public List<UserFriend> getAllUserFriendLinks() {
         String sqlQuery = "select * from USER_FRIEND";
         return jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> mapRowToUserFriend(rs)));
     }
 
     @Override
-    public UserFriend getByOwnerId(Long id) {
+    public UserFriend getUserFriendLinkByOwnerId(Long ownerId) {
         String sqlQuery = "select * from USER_FRIEND where OWNER_USER_ID = ?";
-        List<UserFriend> userFriends = jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> mapRowToUserFriend(rs)), id);
+        List<UserFriend> userFriends = jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> mapRowToUserFriend(rs)), ownerId);
 
         if (userFriends.size() != 1) {
-            throw new EntityNotFoundException(String.format("Сущность с %d не найдена в таблице USER:", id));
+            throw new EntityNotFoundException(String.format("Сущность с %d не найдена в таблице USER:", ownerId));
         }
 
         return userFriends.get(0);

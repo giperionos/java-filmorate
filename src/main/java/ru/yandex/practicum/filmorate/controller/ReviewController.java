@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.EventType;
@@ -12,7 +11,6 @@ import ru.yandex.practicum.filmorate.service.event.EventService;
 import ru.yandex.practicum.filmorate.service.review.ReviewService;
 
 import javax.validation.Valid;
-import javax.validation.ValidationException;
 import java.util.List;
 
 @RestController
@@ -46,7 +44,7 @@ public class ReviewController {
     }
 
     @PutMapping
-    public Review updateReview (@Valid @RequestBody Review review) {
+    public Review updateReview(@Valid @RequestBody Review review) {
         final Review updatedReview = reviewService.updateReview(review);
         log.debug("Добавление PUT запроса /reviews");
         eventService.add(Event.of(
@@ -58,21 +56,21 @@ public class ReviewController {
         return updatedReview;
     }
 
-    @DeleteMapping("/{id}")
-    public void deleteReview(@PathVariable Long id) {
+    @DeleteMapping("/{reviewId}")
+    public void deleteReviewById(@PathVariable Long reviewId) {
         eventService.add(Event.of(
-                id,
-                reviewService.getReviewById(id).getUserId(),
+                reviewId,
+                reviewService.getReviewById(reviewId).getUserId(),
                 EVENT_REVIEW,
                 Operation.of(1, "REMOVE"))
         );
 
-        reviewService.deleteReview(id);
+        reviewService.deleteReviewById(reviewId);
     }
 
-    @GetMapping("/{id}")
-    public Review getReviewById(@PathVariable Long id) {
-        return reviewService.getReviewById(id);
+    @GetMapping("/{reviewId}")
+    public Review getReviewById(@PathVariable Long reviewId) {
+        return reviewService.getReviewById(reviewId);
     }
 
     @GetMapping
@@ -85,23 +83,23 @@ public class ReviewController {
         }
     }
 
-    @PutMapping ("/{id}/like/{userId}")
-    public void addLikeReview(@PathVariable Long id, @PathVariable Long userId) {
-        reviewService.addLikeReview(id, userId);
+    @PutMapping ("/{reviewId}/like/{userId}")
+    public void addLikeReview(@PathVariable Long reviewId, @PathVariable Long userId) {
+        reviewService.addLikeReview(reviewId, userId);
     }
 
-    @PutMapping("/{id}/dislike/{userId}")
-    public void addDislikeReview(@PathVariable Long id, @PathVariable Long userId) {
-        reviewService.addDislikeReview(id, userId);
+    @PutMapping("/{reviewId}/dislike/{userId}")
+    public void addDislikeReview(@PathVariable Long reviewId, @PathVariable Long userId) {
+        reviewService.addDislikeReview(reviewId, userId);
     }
 
-    @DeleteMapping("/{id}/like/{userId}")
-    public void  deleteLikeReview(@PathVariable Long id, @PathVariable Long userId){
-        reviewService.deleteLikeReview(id, userId);
+    @DeleteMapping("/{reviewId}/like/{userId}")
+    public void  deleteLikeReview(@PathVariable Long reviewId, @PathVariable Long userId){
+        reviewService.deleteLikeReview(reviewId, userId);
     }
 
-    @DeleteMapping("/{id}/dislike/{userId}")
-    public void  deleteDislikeReview(@PathVariable Long id, @PathVariable Long userId){
-        reviewService.deleteDislikeReview(id, userId);
+    @DeleteMapping("/{reviewId}/dislike/{userId}")
+    public void  deleteDislikeReview(@PathVariable Long reviewId, @PathVariable Long userId){
+        reviewService.deleteDislikeReview(reviewId, userId);
     }
 }

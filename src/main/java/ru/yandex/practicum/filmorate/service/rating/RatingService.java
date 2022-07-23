@@ -17,11 +17,11 @@ public class RatingService {
         this.ratingStorage = ratingStorage;
     }
 
-    public MPARating getById(Integer id){
-        return ratingStorage.getById(id);
+    public MPARating getByMPARatingId(Integer ratingMpaId){
+        return ratingStorage.getRatingMpaById(ratingMpaId);
     }
 
-    public List<MPARating> getAll(){
-        return ratingStorage.getAll();
+    public List<MPARating> getAllMPARatings(){
+        return ratingStorage.getAllRatingsMpa();
     }
 }

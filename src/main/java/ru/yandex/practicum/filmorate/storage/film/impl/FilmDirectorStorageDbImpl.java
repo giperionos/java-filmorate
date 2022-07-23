@@ -11,32 +11,32 @@ import java.sql.SQLException;
 import java.util.List;
 
 @Component
-public class FilmDirectorStorageImpl implements FilmDirectorStorage {
+public class FilmDirectorStorageDbImpl implements FilmDirectorStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public FilmDirectorStorageImpl(JdbcTemplate jdbcTemplate) {
+    public FilmDirectorStorageDbImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
-    public void add(Long filmId, Integer directorId) {
+    public void addNewFilmDirectorLink(Long filmId, Integer directorId) {
         String sqlQuery = "insert into FILM_DIRECTOR (FILM_ID, DIRECTOR_ID) VALUES ( ?, ? )";
 
         jdbcTemplate.update(sqlQuery, filmId, directorId);
     }
 
     @Override
-    public List<FilmDirector> getByFilmId(Long filmId) {
+    public List<FilmDirector> getFilmDirectorLinksByFilmId(Long filmId) {
         String sqlQuery = "select * from FILM_DIRECTOR where FILM_ID = ?";
         return  jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> mapRowToFilmDirector(rs)), filmId);
     }
 
     @Override
-    public boolean deleteByFilmId(Long id) {
+    public boolean deleteFilmDirectorLinksByFilmId(Long filmId) {
         String sqlQuery = "delete from FILM_DIRECTOR where FILM_ID = ?";
-        return jdbcTemplate.update(sqlQuery, id) > 0;
+        return jdbcTemplate.update(sqlQuery, filmId) > 0;
     }
 
     private FilmDirector mapRowToFilmDirector(ResultSet rs) throws SQLException {
