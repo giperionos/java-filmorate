@@ -13,7 +13,6 @@ import ru.yandex.practicum.filmorate.storage.film.FilmDirectorStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmGenreStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
-import ru.yandex.practicum.filmorate.storage.like.LikeStorage;
 import ru.yandex.practicum.filmorate.storage.rating.RatingStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -32,7 +31,7 @@ public class FilmService {
     private final UserStorage userStorage;
 
     @Autowired
-    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage,
+    public FilmService(@Qualifier("filmStorageDbImpl") FilmStorage filmStorage,
                        RatingStorage ratingStorage,
                        FilmGenreStorage filmGenreStorage,
                        GenreStorage genreStorage,
@@ -49,46 +48,47 @@ public class FilmService {
         this.userStorage = userStorage;
     }
 
-    public Film add(Film film) {
-        Film addedFilm = filmStorage.add(film);
+    public Film addNewFilm(Film film) {
+        Film addedFilm = filmStorage.addNewFilm(film);
 
         //Дозаполнить объект рейтинга MPA в составе объекта Film
         fillMPAForFilm(addedFilm);
 
         //заполнить объекты жанров в составе объекта Film и добавить их БД для данного Film
-        addGenreFilmToDB(addedFilm, false);
+        addGenreFilmToDB(addedFilm);
 
         //заполнить объекты Режиссеров в составе объекта Film и добавить их БД для данного Film
-        addFilmDirectorToDB(addedFilm, false);
+        addFilmDirectorToDB(addedFilm);
 
         return addedFilm;
     }
 
-    public Film update(Film film) {
+    public Film updateFilm(Film film) {
         try {
             //обновить фильм в самой таблице Film
-            Film updatedFilm = filmStorage.update(film);
+            Film updatedFilm = filmStorage.updateFilm(film);
 
             //Дозаполнить объект рейтинга MPA в составе объекта Film
             fillMPAForFilm(updatedFilm);
 
             //также нужно обновить жанры
             //заполнить объекты жанров в составе объекта Film и добавить их БД для данного Film
-            addGenreFilmToDB(updatedFilm, true);
+            updateGenreFilmToDB(updatedFilm);
 
             //заполнить объекты Режиссеров в составе объекта Film и добавить их БД для данного Film
-            addFilmDirectorToDB(updatedFilm, true);
+            updateFilmDirectorToDB(updatedFilm);
 
             return updatedFilm;
 
-        } catch (EntityNotFoundException exception) {
-            throw new UnknownFilmException(String.format("Фильм с %d не найден в хранилище.", film.getId()));
+        } catch (UnknownFilmException exception) {
+            log.warn(String.format("Фильм с %d не найден в БД.", film.getId()));
+            throw exception;
         }
 
     }
 
-    public List<Film> getAll() {
-        List<Film> allFilms = filmStorage.getAll();
+    public List<Film> getAllFilms() {
+        List<Film> allFilms = filmStorage.getAllFilms();
 
         //заполнить жанры и режиссеров для фильмов
         for (Film film: allFilms) {
@@ -99,11 +99,14 @@ public class FilmService {
         return allFilms;
     }
 
-    public Film getFilmById(Long id) {
-        Film foundedFilm = filmStorage.getById(id);
+    public Film getFilmById(Long filmId) {
+        Film foundedFilm;
 
-        if (foundedFilm == null) {
-            throw new EntityNotFoundException(String.format("Фильм с %d не найден в хранилище.", id));
+        try {
+            foundedFilm = filmStorage.getFilmById(filmId);
+        } catch (UnknownFilmException exception) {
+            log.warn(String.format("Фильм с %d не найден в БД.", filmId));
+            throw exception;
         }
 
         //заполнить жанры для фильма
@@ -116,7 +119,7 @@ public class FilmService {
     }
 
     public List<Film> getPopularFilms(Long count, Optional<Integer> genreId, Optional<Integer> year) {
-        List<Film> popularFilms = filmStorage.getMostPopularList(count, genreId, year);
+        List<Film> popularFilms = filmStorage.getMostPopularFilmsList(count, genreId, year);
 
         //заполнить жанры и режиссеров для фильмов
         for (Film film: popularFilms) {
@@ -127,15 +130,15 @@ public class FilmService {
         return popularFilms;
     }
 
-    public List<Film> getFilmsByQuery(String query, String by) {
-        final List<Film> films = filmStorage.getFilmsByQuery(query, by);
+    public List<Film> getFilmsByQuery(String query, String queryParam) {
+        final List<Film> films = filmStorage.getFilmsByQuery(query, queryParam);
         films.forEach(this::fillGenreForFilm);
         films.forEach(this::fillDirectorForFilm);
         return films;
     }
 
-    public void deleteFilmById(Long id) {
-        filmStorage.deleteById(id);
+    public void deleteFilmById(Long filmId) {
+        filmStorage.deleteFilmById(filmId);
     }
 
     public Collection<Film> getRecommendations(Long userId) {
@@ -147,7 +150,7 @@ public class FilmService {
 
     private void fillGenreForFilm(Film film) {
 
-        List<FilmGenre> filmDBGenres = filmGenreStorage.getByFilmId(film.getId());
+        List<FilmGenre> filmDBGenres = filmGenreStorage.getFilmGenreLinksByFilmId(film.getId());
 
         //заполнить объекты Жанров в составе объекта Film
         Set<Genre> filmGenresSorted = new TreeSet<>(new Comparator<Genre>() {
@@ -159,32 +162,44 @@ public class FilmService {
 
 
         for (FilmGenre filmGenre : filmDBGenres) {
-            filmGenresSorted.add(genreStorage.getById(filmGenre.getGenreId()));
+            filmGenresSorted.add(genreStorage.getGenreById(filmGenre.getGenreId()));
         }
 
         film.setGenres(filmGenresSorted);
     }
 
-    private void addGenreFilmToDB(Film film, boolean needCleanBeforeAdd) {
+    private void addGenreFilmToDB(Film film) {
 
-        //если нужно добавить в БД
         if (film.getGenres() == null) {
-            //но если это апдейт, возможно у предыдущей версии фильма были связки с жанрами,
-            //а сейчас их уже нет, значит нужно удалить
-            if (needCleanBeforeAdd) {
-                filmGenreStorage.deleteByFilmId(film.getId());
-            }
+            //так как жанров нет, значит ничего делать не нужно
             return;
         }
 
-        //нужно ли предварительно почистить таблицу связей с жанрами
-        if (needCleanBeforeAdd) {
-            //почистить жанры для фильма, прежде чем добавить обновленные
-            filmGenreStorage.deleteByFilmId(film.getId());
+        for (Genre genre : film.getGenres()) {
+            filmGenreStorage.addNewFilmGenreLink(film.getId(), genre.getId());
         }
 
+        //заполнить объекты жанров в составе объекта Film
+        fillGenreForFilm(film);
+    }
+
+    private void updateGenreFilmToDB(Film film) {
+
+        if (film.getGenres() == null) {
+            //это апдейт, возможно у предыдущей версии фильма были связки с жанрами,
+            //а сейчас их уже нет, значит нужно удалить
+            filmGenreStorage.deleteFilmGenreLinksByFilmId(film.getId());
+
+            //так как жанров нет, значит ничего делать не нужно
+            return;
+        }
+
+        //почистить жанры для фильма, прежде чем добавить обновленные
+        filmGenreStorage.deleteFilmGenreLinksByFilmId(film.getId());
+
+
         for (Genre genre : film.getGenres()) {
-            filmGenreStorage.add(film.getId(), genre.getId());
+            filmGenreStorage.addNewFilmGenreLink(film.getId(), genre.getId());
         }
 
         //заполнить объекты жанров в составе объекта Film
@@ -198,32 +213,45 @@ public class FilmService {
         }
 
         //Дозаполнить объект рейтинга MPA в составе объекта Film
-        MPARating mpaRating = ratingStorage.getById(film.getMpa().getId());
+        MPARating mpaRating = ratingStorage.getRatingMpaById(film.getMpa().getId());
         film.getMpa().setName(mpaRating.getName());
         film.getMpa().setDescription(mpaRating.getDescription());
     }
 
 
-    private void addFilmDirectorToDB(Film film, boolean needCleanBeforeAdd) {
+    private void addFilmDirectorToDB(Film film) {
 
         //если режиссеры для фильма не указаны, значит добавлять не нужно
         if (film.getDirectors() == null) {
-            //но если это апдейт, возможно у предыдущей версии фильма были связки с режиссерами,
-            //а сейчас их уже нет, значит нужно удалить
-            if (needCleanBeforeAdd) {
-                filmDirectorStorage.deleteByFilmId(film.getId());
-            }
             return;
-        }
-
-        //нужно ли предварительно почистить прежние связи для данного фильма с режиссерами
-        if (needCleanBeforeAdd) {
-            filmDirectorStorage.deleteByFilmId(film.getId());
         }
 
         //для каждого указанного режиссера добавить связку с фильмом
         for (Director director: film.getDirectors()) {
-            filmDirectorStorage.add(film.getId(), director.getId());
+            filmDirectorStorage.addNewFilmDirectorLink(film.getId(), director.getId());
+        }
+
+        //дозаполнить объекты режиссеров в составе объекта Film
+        fillDirectorForFilm(film);
+    }
+
+
+    private void updateFilmDirectorToDB(Film film) {
+
+        //если режиссеры для фильма не указаны, значит добавлять не нужно
+        if (film.getDirectors() == null) {
+            //это апдейт, возможно у предыдущей версии фильма были связки с режиссерами,
+            //а сейчас их уже нет, значит нужно удалить
+            filmDirectorStorage.deleteFilmDirectorLinksByFilmId(film.getId());
+            return;
+        }
+
+        //нужно ли предварительно почистить прежние связи для данного фильма с режиссерами
+        filmDirectorStorage.deleteFilmDirectorLinksByFilmId(film.getId());
+
+        //для каждого указанного режиссера добавить связку с фильмом
+        for (Director director: film.getDirectors()) {
+            filmDirectorStorage.addNewFilmDirectorLink(film.getId(), director.getId());
         }
 
         //дозаполнить объекты режиссеров в составе объекта Film
@@ -231,9 +259,9 @@ public class FilmService {
     }
 
     private void fillDirectorForFilm(Film film) {
-        List<FilmDirector> filmDBDirectors = filmDirectorStorage.getByFilmId(film.getId());
+        List<FilmDirector> filmDBDirectors = filmDirectorStorage.getFilmDirectorLinksByFilmId(film.getId());
 
-        //заполнить объекты  Режиссерово в составе объекта Film
+        //заполнить объекты Режиссёров в составе объекта Film
         Set<Director> filmDirectorsSorted = new TreeSet<>(new Comparator<Director>() {
             @Override
             public int compare(Director o1, Director o2) {
@@ -243,17 +271,17 @@ public class FilmService {
 
 
         for (FilmDirector filmDirector : filmDBDirectors) {
-            filmDirectorsSorted.add(directorStorage.getById(filmDirector.getDirectorId()));
+            filmDirectorsSorted.add(directorStorage.getDirectorById(filmDirector.getDirectorId()));
         }
 
         film.setDirectors(filmDirectorsSorted);
     }
 
 
-    public List<Film> getSortedFilmsForDirector(Integer directorId, String sortBy) {
+    public List<Film> getSortedFilmsForDirector(Integer directorId, SortType sortByType) {
         //сначала нужно убедиться, что режиссер с таким id вообще есть
         try {
-            directorStorage.getById(directorId);
+            directorStorage.getDirectorById(directorId);
         } catch (EntityNotFoundException e) {
             log.warn("Для поиска фильмов пришел неизвестный режиссер.");
             throw e;
@@ -261,13 +289,13 @@ public class FilmService {
 
         List<Film> sortedFilms;
 
-        switch (sortBy) {
-            case "year":
+        switch (sortByType) {
+            case YEAR:
                 //Вывод всех фильмов режиссёра, отсортированных по годам.
                 sortedFilms = filmStorage.getFilmsForDirectorSortedByYears(directorId);
                 break;
 
-            case "likes":
+            case LIKES:
                 //Вывод всех фильмов режиссёра, отсортированных по количеству лайков
                 sortedFilms = filmStorage.getFilmsForDirectorSortedByLikes(directorId);
                 break;
@@ -293,15 +321,15 @@ public class FilmService {
     public List<Film> getCommonFilms(Long userId, Long friendId) {
         //предварительно нужно убедиться, что такие пользователи есть
         try {
-            userStorage.getById(userId);
-        } catch (EntityNotFoundException e) {
+            userStorage.getUserById(userId);
+        } catch (UnknownUserException e) {
             log.warn("Пришел неизвестный пользователь с id = " + userId);
             throw e;
         }
 
         try {
-            userStorage.getById(friendId);
-        } catch (EntityNotFoundException e) {
+            userStorage.getUserById(friendId);
+        } catch (UnknownUserException e) {
             log.warn("Пришел неизвестный пользователь с id = " + friendId);
             throw e;
         }

@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.model;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import ru.yandex.practicum.filmorate.config.FilmorateConfig;
 
 import javax.validation.ConstraintViolation;

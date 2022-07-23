@@ -53,12 +53,12 @@ public class ReviewService {
         return reviewStorage.updateReview(review);
     }
 
-    public void deleteReview(long id) {
-        reviewStorage.deleteReview(id);
+    public void deleteReviewById(Long reviewId) {
+        reviewStorage.deleteReview(reviewId);
     }
 
-    public Review getReviewById(long id) {
-        return reviewStorage.getReviewById(id);
+    public Review getReviewById(Long reviewId) {
+        return reviewStorage.getReviewById(reviewId);
     }
 
     public List<Review> getAllReviewes(Integer count) {
@@ -69,27 +69,27 @@ public class ReviewService {
         return reviewStorage.getReviewesByFilmId(count, filmId);
     }
 
-    public void addLikeReview(Long id, Long userId) {
-        if (usefulReviewStorage.addLikeReview(id, userId)){
-            reviewStorage.addLike(id);
+    public void addLikeReview(Long reviewId, Long userId) {
+        if (usefulReviewStorage.addLikeReview(reviewId, userId)){
+            reviewStorage.addLike(reviewId);
         }
     }
 
-    public void addDislikeReview(Long id, Long userId) {
-        if (usefulReviewStorage.addDislikeReview(id, userId)){
-            reviewStorage.addDislike(id);
+    public void addDislikeReview(Long reviewId, Long userId) {
+        if (usefulReviewStorage.addDislikeReview(reviewId, userId)){
+            reviewStorage.addDislike(reviewId);
         }
     }
 
-    public void deleteLikeReview(Long id, Long userId) {
-        if (usefulReviewStorage.deleteLikeReview(id, userId)){
-            reviewStorage.deleteLike(id);
+    public void deleteLikeReview(Long reviewId, Long userId) {
+        if (usefulReviewStorage.deleteLikeReview(reviewId, userId)){
+            reviewStorage.deleteLike(reviewId);
         }
     }
 
-    public void deleteDislikeReview(Long id, Long userId) {
-        if (usefulReviewStorage.deleteDislikeReview(id, userId)){
-            reviewStorage.deleteDislike(id);
+    public void deleteDislikeReview(Long reviewId, Long userId) {
+        if (usefulReviewStorage.deleteDislikeReview(reviewId, userId)){
+            reviewStorage.deleteDislike(reviewId);
         }
     }
 }

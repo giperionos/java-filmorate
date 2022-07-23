@@ -2,27 +2,24 @@ package ru.yandex.practicum.filmorate.storage.event.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.storage.event.EventStorage;
 
-import java.sql.PreparedStatement;
 import java.util.Collection;
 
 @Repository
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-public class EventDbStorage implements EventStorage {
+public class EventStorageDbImpl implements EventStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public Collection<Event> getByUserId(Long id) {
+    public Collection<Event> getByEventsByUserId(Long userId) {
         final String sqlQuery =
                 "select\n" +
                 "    E.*,\n" +
@@ -38,7 +35,7 @@ public class EventDbStorage implements EventStorage {
                 rs.getLong("EVENT_ID"),
                 rs.getTimestamp("EVENT_TIMESTAMP").getTime(),
                 rs.getLong("ENTITY_ID"),
-                id,
+                userId,
                 EventType.of(
                         rs.getInt("EVENTTYPE_ID"),
                         rs.getString("EVENTTYPE_NAME")
@@ -48,11 +45,11 @@ public class EventDbStorage implements EventStorage {
                         rs.getString("OPERATION_NAME")
                 )
         );
-        return jdbcTemplate.query(sqlQuery, mapper, id);
+        return jdbcTemplate.query(sqlQuery, mapper, userId);
     }
 
     @Override
-    public void add(Event event) {
+    public void addNewEvent(Event event) {
         final String sqlQuery =
                 "insert into EVENT(ENTITY_ID, USER_ID, EVENTTYPE_ID, OPERATION_ID) " +
                 "values (?, ?, ?, ?)";

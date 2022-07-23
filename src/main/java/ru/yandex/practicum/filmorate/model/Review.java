@@ -39,12 +39,4 @@ public class Review {
 
     public Review() {
     }
-
-   /* public boolean getIsPositive() {
-        return this.isPositive;
-    }
-
-    public void setIsPositive(boolean isPositive) {
-        this.isPositive = isPositive;
-    }*/
 }

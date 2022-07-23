@@ -15,14 +15,14 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-class RatingStorageImplTest {
+class RatingStorageDbImplTest {
 
-    private final RatingStorageImpl ratingStorage;
+    private final RatingStorageDbImpl ratingStorage;
 
     @Test
     public void testFindRatingById() {
 
-       MPARating mpa = ratingStorage.getById(1);
+       MPARating mpa = ratingStorage.getRatingMpaById(1);
        assertEquals(1, mpa.getId(), "id не совпадает.");
        assertEquals("G", mpa.getName(), "Name не совпадает.");
        assertEquals("У фильма нет возрастных ограничений", mpa.getDescription(), "Description не совпадает.");
@@ -30,7 +30,7 @@ class RatingStorageImplTest {
 
     @Test
     public void testGetAllRatings() {
-        List<MPARating> dbRatings = ratingStorage.getAll();
+        List<MPARating> dbRatings = ratingStorage.getAllRatingsMpa();
 
         assertEquals(5, dbRatings.size(), "Количество записей не совпадает с ожидаемым.");
 

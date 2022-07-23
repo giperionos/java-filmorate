@@ -7,41 +7,48 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.config.FilmorateConfig;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.FilmGenre;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.MPARating;
-import ru.yandex.practicum.filmorate.storage.genre.impl.GenreStorageImpl;
+import ru.yandex.practicum.filmorate.model.*;
+import ru.yandex.practicum.filmorate.storage.genre.impl.GenreStorageDbImpl;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-class FilmGenreStorageImplTest {
+class FilmGenreStorageDbImplTest {
 
-    private final FilmGenreStorageImpl filmGenreStorage;
-    private final FilmDbStorage filmDbStorage;
-    private final GenreStorageImpl genreStorage;
+    private final FilmGenreStorageDbImpl filmGenreStorage;
+    private final FilmStorageDbImpl filmDbStorage;
+    private final GenreStorageDbImpl genreStorage;
 
     private static Film film;
     private static Genre comedyGenre;
     private static Genre cartoonGenre;
 
+    private static Long film1_id = null;
+    private static String film1_name = "Matrix";
+    private static String film1_description = "Super-Mega Film";
+    private static LocalDate film1_releaseDate = LocalDate.parse("14.10.1999", FilmorateConfig.normalDateFormatter);
+    private static Integer film1_duration = 136;
+    private static MPARating film1_mpa = new MPARating(4, "R", "Лицам до 17 лет просматривать фильм можно только в присутствии взрослого" );
+    private static Set<Genre> film1_genres = null;
+    private static Set<Director> film1_directors = null;
+
     @BeforeAll
     public static void init() {
         film = new Film(
-                null,
-                "Matrix",
-                "Super-Mega Film",
-                LocalDate.parse("14.10.1999", FilmorateConfig.normalDateFormatter),
-                136,
-                new MPARating(4, "R", "Лицам до 17 лет просматривать фильм можно только в присутствии взрослого" ),
-                null,
-                null);
+                film1_id,
+                film1_name,
+                film1_description,
+                film1_releaseDate,
+                film1_duration,
+                film1_mpa,
+                film1_genres,
+                film1_directors);
 
         comedyGenre = new Genre(1, "Комедия");
         cartoonGenre = new Genre(3, "Мультфильм");
@@ -50,18 +57,18 @@ class FilmGenreStorageImplTest {
     @Test
     void testAddFilmGenre() {
         //сначала нужно, чтобы был фильм в БД
-        filmDbStorage.add(film);
+        filmDbStorage.addNewFilm(film);
 
         //нужно, чтобы были жанры в БД
-        genreStorage.add(comedyGenre);
-        genreStorage.add(cartoonGenre);
+        genreStorage.addNewGenre(comedyGenre);
+        genreStorage.addNewGenre(cartoonGenre);
 
         //добавить для фильма жанры
-        filmGenreStorage.add(film.getId(), comedyGenre.getId());
-        filmGenreStorage.add(film.getId(), cartoonGenre.getId());
+        filmGenreStorage.addNewFilmGenreLink(film.getId(), comedyGenre.getId());
+        filmGenreStorage.addNewFilmGenreLink(film.getId(), cartoonGenre.getId());
 
         //получить из БД жанры связанные с фильмом
-        List<FilmGenre> filmGenresDb = filmGenreStorage.getByFilmId(film.getId());
+        List<FilmGenre> filmGenresDb = filmGenreStorage.getFilmGenreLinksByFilmId(film.getId());
 
         //список ожидаемых связок фильм-жанр
         List<FilmGenre> filmGenresExpected = List.of(
@@ -76,22 +83,22 @@ class FilmGenreStorageImplTest {
     @Test
     void testDeleteFilmGenreByFilmId() {
         //сначала нужно, чтобы был фильм в БД
-        filmDbStorage.add(film);
+        filmDbStorage.addNewFilm(film);
 
         //нужно, чтобы были жанры в БД
-        genreStorage.add(comedyGenre);
-        genreStorage.add(cartoonGenre);
+        genreStorage.addNewGenre(comedyGenre);
+        genreStorage.addNewGenre(cartoonGenre);
 
         //добавить для фильма жанры
-        filmGenreStorage.add(film.getId(), comedyGenre.getId());
-        filmGenreStorage.add(film.getId(), cartoonGenre.getId());
+        filmGenreStorage.addNewFilmGenreLink(film.getId(), comedyGenre.getId());
+        filmGenreStorage.addNewFilmGenreLink(film.getId(), cartoonGenre.getId());
 
         //удалить один жанр для фильма
-        filmGenreStorage.deleteByFilmId(film.getId());
+        filmGenreStorage.deleteFilmGenreLinksByFilmId(film.getId());
 
         //проверить, что для фильма не осталось связок фильм-жанр
         //получить из БД жанры связанные с фильмом
-        List<FilmGenre> filmGenresDb = filmGenreStorage.getByFilmId(film.getId());
+        List<FilmGenre> filmGenresDb = filmGenreStorage.getFilmGenreLinksByFilmId(film.getId());
 
         assertTrue(filmGenresDb.isEmpty(), "Список связок фильм-жанр не пустой после удаления.");
     }
@@ -99,17 +106,17 @@ class FilmGenreStorageImplTest {
     @Test
     void testGetFilmGenresByFilmId() {
         //сначала нужно, чтобы был фильм в БД
-        filmDbStorage.add(film);
+        filmDbStorage.addNewFilm(film);
 
         //нужно, чтобы были жанры в БД
-        genreStorage.add(comedyGenre);
-        genreStorage.add(cartoonGenre);
+        genreStorage.addNewGenre(comedyGenre);
+        genreStorage.addNewGenre(cartoonGenre);
 
         //добавить для фильма жанры
-        filmGenreStorage.add(film.getId(), comedyGenre.getId());
-        filmGenreStorage.add(film.getId(), cartoonGenre.getId());
+        filmGenreStorage.addNewFilmGenreLink(film.getId(), comedyGenre.getId());
+        filmGenreStorage.addNewFilmGenreLink(film.getId(), cartoonGenre.getId());
 
-        List<FilmGenre> filmGenresDb = filmGenreStorage.getByFilmId(film.getId());
+        List<FilmGenre> filmGenresDb = filmGenreStorage.getFilmGenreLinksByFilmId(film.getId());
 
         //список ожидаемых связок фильм-жанр
         List<FilmGenre> filmGenresExpected = List.of(
@@ -124,17 +131,17 @@ class FilmGenreStorageImplTest {
     @Test
     void testGetAllFilmGenres() {
         //сначала нужно, чтобы был фильм в БД
-        filmDbStorage.add(film);
+        filmDbStorage.addNewFilm(film);
 
         //нужно, чтобы были жанры в БД
-        genreStorage.add(comedyGenre);
-        genreStorage.add(cartoonGenre);
+        genreStorage.addNewGenre(comedyGenre);
+        genreStorage.addNewGenre(cartoonGenre);
 
         //добавить для фильма жанры
-        filmGenreStorage.add(film.getId(), comedyGenre.getId());
-        filmGenreStorage.add(film.getId(), cartoonGenre.getId());
+        filmGenreStorage.addNewFilmGenreLink(film.getId(), comedyGenre.getId());
+        filmGenreStorage.addNewFilmGenreLink(film.getId(), cartoonGenre.getId());
 
-        List<FilmGenre> filmGenresDb = filmGenreStorage.getAll();
+        List<FilmGenre> filmGenresDb = filmGenreStorage.getAllFilmGenreLinks();
 
         //список ожидаемых связок фильм-жанр
         List<FilmGenre> filmGenresExpected = List.of(

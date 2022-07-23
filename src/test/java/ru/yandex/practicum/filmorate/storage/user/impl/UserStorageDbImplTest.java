@@ -17,54 +17,55 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-class UserDbStorageTest {
+class UserStorageDbImplTest {
 
-    private  final UserDbStorage userDbStorage;
+    private  final UserStorageDbImpl userDbStorage;
     private static User user;
+    private static Long user_id_null = null;
 
     @BeforeAll
     public static void beforeAll(){
-        user = new User(null, "test@test.ru", "login", "name",  LocalDate.parse("14.10.1999", FilmorateConfig.normalDateFormatter));
+        user = new User(user_id_null, "test@test.ru", "login", "name",  LocalDate.parse("14.10.1999", FilmorateConfig.normalDateFormatter));
     }
 
     @Test
     void testAddUser() {
-        userDbStorage.add(user);
-        User addedUser = userDbStorage.getById(user.getId());
+        userDbStorage.addNewUser(user);
+        User addedUser = userDbStorage.getUserById(user.getId());
 
         assertEquals(user, addedUser, "Добавленный пользователь не совпадает с исходным.");
     }
 
     @Test
     void testUpdate() {
-        userDbStorage.add(user);
+        userDbStorage.addNewUser(user);
 
-        user.setEmail("test@test.ru update");
-        user.setLogin("login update");
-        user.setName("name update");
+        user.setEmail("test@test.ru updateFilm");
+        user.setLogin("login updateFilm");
+        user.setName("name updateFilm");
 
-        userDbStorage.update(user);
-        User updatedUser = userDbStorage.getById(user.getId());
+        userDbStorage.updateUser(user);
+        User updatedUser = userDbStorage.getUserById(user.getId());
 
         assertEquals(user.getId(), updatedUser.getId(), "Id не должен был поменяться.");
-        assertEquals("test@test.ru update", updatedUser.getEmail(), "Не изменился email");
-        assertEquals("login update", updatedUser.getLogin(), "Не изменился login");
-        assertEquals("name update", updatedUser.getName(), "Не изменился name");
+        assertEquals("test@test.ru updateFilm", updatedUser.getEmail(), "Не изменился email");
+        assertEquals("login updateFilm", updatedUser.getLogin(), "Не изменился login");
+        assertEquals("name updateFilm", updatedUser.getName(), "Не изменился name");
     }
 
     @Test
     void testGetAll() {
-        userDbStorage.add(user);
+        userDbStorage.addNewUser(user);
 
-        List<User> users = userDbStorage.getAll();
+        List<User> users = userDbStorage.getAllUsers();
         assertFalse(users.isEmpty(), "Размер полученного списка пустой.");
     }
 
     @Test
     void testGetById() {
-         userDbStorage.add(user);
+         userDbStorage.addNewUser(user);
 
-         User foundedUser = userDbStorage.getById(user.getId());
+         User foundedUser = userDbStorage.getUserById(user.getId());
          assertEquals(user, foundedUser, "Полученный пользователь не совпадает с ожидаемым.");
     }
 }

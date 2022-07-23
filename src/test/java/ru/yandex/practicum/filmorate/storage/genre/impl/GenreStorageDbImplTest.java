@@ -14,13 +14,13 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-class GenreStorageImplTest {
+class GenreStorageDbImplTest {
 
-    private final GenreStorageImpl genreStorage;
+    private final GenreStorageDbImpl genreStorage;
 
     @Test
     void testFindGenreById() {
-        Genre dbGenre1 = genreStorage.getById(1);
+        Genre dbGenre1 = genreStorage.getGenreById(1);
         assertEquals(1, dbGenre1.getId(), "id не совпадает.");
         assertEquals("Комедия", dbGenre1.getName(), "Name не совпадает.");
     }
@@ -28,7 +28,7 @@ class GenreStorageImplTest {
     @Test
     void testGetAllGenres() {
 
-        List<Genre> dbGenres = genreStorage.getAll();
+        List<Genre> dbGenres = genreStorage.getAllGenres();
 
         List<Genre> expectedGenres = List.of(
                 new Genre(1, "Комедия"),

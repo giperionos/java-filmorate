@@ -12,33 +12,33 @@ import java.sql.SQLException;
 import java.util.List;
 
 @Component
-public class GenreStorageImpl implements GenreStorage {
+public class GenreStorageDbImpl implements GenreStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public GenreStorageImpl(JdbcTemplate jdbcTemplate) {
+    public GenreStorageDbImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
-    public Genre getById(Integer id) {
+    public Genre getGenreById(Integer genreId) {
         String sqlQuery = "select * from GENRE where GENRE_ID = ?";
-        List<Genre> genres = jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> mapRowToGenre(rs)), id);
+        List<Genre> genres = jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> mapRowToGenre(rs)), genreId);
         if (genres.size() != 1) {
-            throw new EntityNotFoundException(String.format("Сущность с %d не найдена в таблице GENRE:", id));
+            throw new EntityNotFoundException(String.format("Сущность с %d не найдена в таблице GENRE:", genreId));
         }
         return genres.get(0);
     }
 
     @Override
-    public List<Genre> getAll() {
+    public List<Genre> getAllGenres() {
         String sqlQuery = "select * from GENRE";
         return jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> mapRowToGenre(rs)));
     }
 
     @Override
-    public void add(Genre genre) {
+    public void addNewGenre(Genre genre) {
         String sqlQuery = "MERGE INTO GENRE (GENRE_ID, GENRE_NAME) VALUES (?, ? );";
 
         jdbcTemplate.update(sqlQuery, genre.getId(), genre.getName());

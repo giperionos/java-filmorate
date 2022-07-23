@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.service.director.DirectorService;
@@ -23,13 +22,13 @@ public class DirectorController {
     }
 
     @GetMapping
-    public List<Director> getAll() {
+    public List<Director> getAllDirectors() {
         return directorService.getAllDirectors();
     }
 
-    @GetMapping("/{id}")
-    public Director getById(@PathVariable Integer id) {
-        return directorService.getDirectorById(id);
+    @GetMapping("/{directorId}")
+    public Director getDirectorById(@PathVariable Integer directorId) {
+        return directorService.getDirectorById(directorId);
     }
 
     @PostMapping
@@ -42,8 +41,8 @@ public class DirectorController {
         return  directorService.updateDirector(director);
     }
 
-    @DeleteMapping("/{id}")
-    public void removeDirectorById(@PathVariable Integer id) {
-        directorService.removeDirectorById(id);
+    @DeleteMapping("/{directorId}")
+    public void removeDirectorById(@PathVariable Integer directorId) {
+        directorService.removeDirectorById(directorId);
     }
 }

@@ -5,9 +5,9 @@ import ru.yandex.practicum.filmorate.model.Director;
 import java.util.List;
 
 public interface DirectorStorage {
-    List<Director> getAll();
-    Director getById(Integer id);
-    Director add(Director director);
-    Director update(Director director);
-    void deleteById(Integer id);
+    List<Director> getAllDirectors();
+    Director getDirectorById(Integer directorId);
+    Director addNewDirector(Director director);
+    Director updateDirector(Director director);
+    void deleteDirectorById(Integer directorId);
 }
