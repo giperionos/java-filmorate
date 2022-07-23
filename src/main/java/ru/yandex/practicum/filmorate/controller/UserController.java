@@ -3,11 +3,7 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.model.Event;
-import ru.yandex.practicum.filmorate.model.EventType;
-import ru.yandex.practicum.filmorate.model.Operation;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.service.event.EventService;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
 import ru.yandex.practicum.filmorate.service.user.UserService;
@@ -24,8 +20,6 @@ public class UserController {
     private final UserService userService;
     private final FilmService filmService;
     private final EventService eventService;
-
-    private static final EventType EVENT_FRIEND = EventType.of(3, "FRIEND");
 
     @Autowired
     public UserController(UserService userService, FilmService filmService, EventService eventService) {
@@ -66,22 +60,22 @@ public class UserController {
     @PutMapping("/{userId}/friends/{friendId}")
     public void addToFriends(@PathVariable Long userId, @PathVariable Long friendId) {
         userService.addToFriends(userId, friendId);
-        eventService.add(Event.of(
+        eventService.add(new Event(
                 friendId,
                 userId,
-                EVENT_FRIEND,
-                Operation.of(2, "ADD"))
+                EventType.FRIEND,
+                Operation.ADD)
         );
     }
 
     @DeleteMapping("/{userId}/friends/{friendId}")
     public void removeFromFriends(@PathVariable Long userId, @PathVariable Long friendId) {
         userService.removeFromFriends(userId, friendId);
-        eventService.add(Event.of(
+        eventService.add(new Event(
                 friendId,
                 userId,
-                EVENT_FRIEND,
-                Operation.of(1, "REMOVE"))
+                EventType.FRIEND,
+                Operation.REMOVE)
         );
 
     }

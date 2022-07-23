@@ -21,8 +21,6 @@ public class FilmController {
     private final LikeService likeService;
     private final EventService eventService;
 
-    private static final EventType EVENT_LIKE = EventType.of(1, "LIKE");
-
     @Autowired
     public FilmController(FilmService filmService, LikeService likeService, EventService eventService) {
         this.filmService = filmService;
@@ -61,22 +59,23 @@ public class FilmController {
     @PutMapping("/{filmId}/like/{userId}")
     public void addLikeForFilmIdByUserId(@PathVariable Long filmId, @PathVariable Long userId) {
         likeService.addLike(filmId, userId);
-        eventService.add(Event.of(
+        eventService.add(new Event(
                 filmId,
                 userId,
-                EVENT_LIKE,
-                Operation.of(2, "ADD"))
+                EventType.LIKE,
+                Operation.ADD
+            )
         );
     }
 
     @DeleteMapping("/{filmId}/like/{userId}")
     public void deleteLikeFilmIdByUserId(@PathVariable Long filmId, @PathVariable Long userId) {
         likeService.removeLike(filmId, userId);
-        eventService.add(Event.of(
+        eventService.add(new Event(
                 filmId,
                 userId,
-                EVENT_LIKE,
-                Operation.of(1, "REMOVE"))
+                EventType.LIKE,
+                Operation.REMOVE)
         );
     }
 
