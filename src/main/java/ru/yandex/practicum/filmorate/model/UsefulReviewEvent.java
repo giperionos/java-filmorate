@@ -6,13 +6,13 @@ import lombok.*;
 @Setter
 @EqualsAndHashCode
 @ToString
-public class UsefulReview {
+public class UsefulReviewEvent {
 
     private Long reviewId;
     private Long userId;
     private Boolean like;
 
-    public UsefulReview(Long reviewId, Long userId, Boolean like) {
+    public UsefulReviewEvent(Long reviewId, Long userId, Boolean like) {
         this.reviewId = reviewId;
         this.userId = userId;
         this.like = like;
