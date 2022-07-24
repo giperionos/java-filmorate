@@ -83,7 +83,6 @@ public class ReviewController {
     public void addLikeReview(@PathVariable Long reviewId, @PathVariable Long userId) {
         reviewService.addLikeReview(reviewId, userId);
         log.debug("Довавлен like к ревью. Id: {}", reviewId);
-
     }
 
     @PutMapping("/{reviewId}/dislike/{userId}")
