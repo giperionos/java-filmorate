@@ -44,8 +44,6 @@ public class ReviewStorageDbImpl implements ReviewStorage {
             final long reviewId = keyHolder.getKey().longValue();
             review.setReviewId(reviewId);
             return getReviewById(reviewId);
-
-
     }
 
     @Override
@@ -140,7 +138,6 @@ public class ReviewStorageDbImpl implements ReviewStorage {
                 rs.getLong("USER_ID"),
                 rs.getLong("FILM_ID"),
                 rs.getInt("USEFUL"));
-
     }
 
 }
