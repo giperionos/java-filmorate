@@ -1,11 +1,8 @@
 package ru.yandex.practicum.filmorate.storage.event.impl;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.storage.event.EventStorage;
@@ -13,37 +10,30 @@ import ru.yandex.practicum.filmorate.storage.event.EventStorage;
 import java.util.Collection;
 
 @Repository
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class EventStorageDbImpl implements EventStorage {
 
     private final JdbcTemplate jdbcTemplate;
+    @Autowired
+    public EventStorageDbImpl(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
     @Override
     public Collection<Event> getByEventsByUserId(Long userId) {
         final String sqlQuery =
                 "select\n" +
-                "    E.*,\n" +
-                "    EVENTTYPE_NAME,\n" +
-                "    OPERATION_NAME\n" +
+                "    E.*\n" +
                 "from EVENT E\n" +
-                "left join EVENTTYPE T on E.EVENTTYPE_ID = T.EVENTTYPE_ID\n" +
-                "left join OPERATION O on O.OPERATION_ID = E.OPERATION_ID\n" +
                 "where USER_ID = ?\n" +
                 "order by E.EVENT_TIMESTAMP";
 
-        final RowMapper<Event> mapper =(rs, rn) -> Event.of(
+        final RowMapper<Event> mapper =(rs, rn) -> new Event(
                 rs.getLong("EVENT_ID"),
                 rs.getTimestamp("EVENT_TIMESTAMP").getTime(),
                 rs.getLong("ENTITY_ID"),
                 userId,
-                EventType.of(
-                        rs.getInt("EVENTTYPE_ID"),
-                        rs.getString("EVENTTYPE_NAME")
-                ),
-                Operation.of(
-                        rs.getInt("OPERATION_ID"),
-                        rs.getString("OPERATION_NAME")
-                )
+                EventType.valueOf(rs.getString("EVENT_TYPE")),
+                Operation.valueOf(rs.getString("OPERATION"))
         );
         return jdbcTemplate.query(sqlQuery, mapper, userId);
     }
@@ -51,14 +41,13 @@ public class EventStorageDbImpl implements EventStorage {
     @Override
     public void addNewEvent(Event event) {
         final String sqlQuery =
-                "insert into EVENT(ENTITY_ID, USER_ID, EVENTTYPE_ID, OPERATION_ID) " +
+                "insert into EVENT(ENTITY_ID, USER_ID, EVENT_TYPE, OPERATION) " +
                 "values (?, ?, ?, ?)";
-        final KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(sqlQuery,
                 event.getEntityId(),
                 event.getUserId(),
-                event.getEventType().getId(),
-                event.getOperation().getId());
+                event.getEventType().toString(),
+                event.getOperation().toString());
     }
 }
