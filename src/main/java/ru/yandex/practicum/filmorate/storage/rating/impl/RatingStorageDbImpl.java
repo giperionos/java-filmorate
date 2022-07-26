@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
-import ru.yandex.practicum.filmorate.model.MPARating;
+import ru.yandex.practicum.filmorate.model.MpaRating;
 import ru.yandex.practicum.filmorate.storage.rating.RatingStorage;
 
 import java.sql.ResultSet;
@@ -22,9 +22,9 @@ public class RatingStorageDbImpl implements RatingStorage {
     }
 
     @Override
-    public MPARating getRatingMpaById(Integer ratingMpaId) {
+    public MpaRating getRatingMpaById(Integer ratingMpaId) {
         String sqlQuery = "select * from RATING_MPA where RATING_ID = ?";
-        List<MPARating> ratings = jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> mapRowToRatingMPA(rs)), ratingMpaId);
+        List<MpaRating> ratings = jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> mapRowToRatingMPA(rs)), ratingMpaId);
         if (ratings.size() != 1) {
             throw new EntityNotFoundException(String.format("Сущность с %d не найдена в хранилище.", ratingMpaId));
         }
@@ -32,13 +32,13 @@ public class RatingStorageDbImpl implements RatingStorage {
     }
 
     @Override
-    public List<MPARating> getAllRatingsMpa() {
+    public List<MpaRating> getAllRatingsMpa() {
         String sqlQuery = "select * from RATING_MPA";
         return jdbcTemplate.query(sqlQuery, ((rs, rowNum) -> mapRowToRatingMPA(rs)));
     }
 
-    public MPARating mapRowToRatingMPA(ResultSet rs) throws SQLException {
-        return new MPARating(
+    public MpaRating mapRowToRatingMPA(ResultSet rs) throws SQLException {
+        return new MpaRating(
                 rs.getInt("RATING_ID"),
                 rs.getString("RATING_NAME"),
                 rs.getString("RATING_DESCRIPTION")

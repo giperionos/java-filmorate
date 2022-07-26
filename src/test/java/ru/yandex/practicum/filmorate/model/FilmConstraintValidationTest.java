@@ -1,16 +1,10 @@
 package ru.yandex.practicum.filmorate.model;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.config.FilmorateConfig;
-
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
-
-
 import java.time.LocalDate;
 import java.util.Set;
 
@@ -18,30 +12,18 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class FilmConstraintValidationTest {
 
-    private static Validator validator;
+    private Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
-    private Film film;
-
-    @BeforeAll
-    public static void beforeAll(){
-        ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
-        validator = validatorFactory.getValidator();
-    }
-
-    @BeforeEach
-    public void beforeEach(){
-        film = new Film(
-                null,
-                "Matrix",
-                "Super-Mega Film",
-                LocalDate.parse("14.10.1999", FilmorateConfig.normalDateFormatter),
-                136,
-                new MPARating(1, "G", "У фильма нет возрастных ограничений" ),
-                null,
-                null);
-    }
-
-    //Test Name
+    private Long film1_id = null;
+    private String film1_name = "Matrix";
+    private String film1_description = "Super-Mega Film";
+    private LocalDate film1_releaseDate = LocalDate.parse("14.10.1999", FilmorateConfig.NORMAL_DATE_FORMATTER);
+    private Integer film1_duration = 136;
+    private MpaRating film1_mpa = new MpaRating(4, "R", "Лицам до 17 лет просматривать фильм можно только в присутствии взрослого" );
+    private Set<Genre> film1_genres = null;
+    private Set<Director> film1_directors = null;
+    private Film film = new Film(film1_id, film1_name, film1_description, film1_releaseDate, film1_duration, film1_mpa,
+            film1_genres, film1_directors);
 
     @Test
     public void shouldBeEmptyValidationErrorsWhenNameIsNotNull(){
@@ -71,8 +53,6 @@ class FilmConstraintValidationTest {
         assertEquals("Название фильма не должно быть пустым.", violations.iterator().next().getMessage());
     }
 
-    //Test Description
-
     @Test
     public void shouldBeEmptyValidationErrorsWhenDescriptionIsEmpty(){
 
@@ -91,7 +71,6 @@ class FilmConstraintValidationTest {
         assertTrue(violations.isEmpty(), "Валидация содержит ошибки, которые не ожидались: " + (violations.isEmpty() ? "" : violations.iterator().next().getMessage()));
     }
 
-
     @Test
     public void shouldBeEmptyValidationErrorsWhenDescriptionExistsAndLengthLessThen200(){
 
@@ -99,7 +78,6 @@ class FilmConstraintValidationTest {
 
         assertTrue(violations.isEmpty(), "Валидация содержит ошибки, которые не ожидались: " + (violations.isEmpty() ? "" : violations.iterator().next().getMessage()));
     }
-
 
     @Test
     public void shouldBeEmptyValidationErrorsWhenDescriptionExistsAndLengthEqual200(){
@@ -109,7 +87,6 @@ class FilmConstraintValidationTest {
 
         assertTrue(violations.isEmpty(), "Валидация содержит ошибки, которые не ожидались: " + (violations.isEmpty() ? "" : violations.iterator().next().getMessage()));
     }
-
 
     @Test
     public void shouldExistValidationErrorsWhenDescriptionExistsAndLengthMoreThen200(){
@@ -121,13 +98,10 @@ class FilmConstraintValidationTest {
         assertEquals("Описание фильма должно быть менее 200 символов.", violations.iterator().next().getMessage());
     }
 
-
-    //Test releaseDate
-
     @Test
     public void shouldExistValidationErrorsWhenReleaseDateEarlierThen28121895(){
 
-        film.setReleaseDate(LocalDate.parse("27.12.1895", FilmorateConfig.normalDateFormatter));
+        film.setReleaseDate(LocalDate.parse("27.12.1895", FilmorateConfig.NORMAL_DATE_FORMATTER));
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
 
         assertFalse(violations.isEmpty(), "Валидация не содержит ошибки, которые ожидались: " + (violations.isEmpty() ? "" : violations.iterator().next().getMessage()));
@@ -137,7 +111,7 @@ class FilmConstraintValidationTest {
     @Test
     public void shouldBeEmptyValidationErrorsWhenReleaseDateEquals28121895(){
 
-        film.setReleaseDate(LocalDate.parse("28.12.1895", FilmorateConfig.normalDateFormatter));
+        film.setReleaseDate(LocalDate.parse("28.12.1895", FilmorateConfig.NORMAL_DATE_FORMATTER));
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
 
         assertTrue(violations.isEmpty(), "Валидация содержит ошибки, которые не ожидались: " + (violations.isEmpty() ? "" : violations.iterator().next().getMessage()));
@@ -150,8 +124,6 @@ class FilmConstraintValidationTest {
 
         assertTrue(violations.isEmpty(), "Валидация содержит ошибки, которые не ожидались: " + (violations.isEmpty() ? "" : violations.iterator().next().getMessage()));
     }
-
-    //Test duration
 
     @Test
     public void shouldExistValidationErrorsWhenDurationLessThenZero(){
@@ -180,6 +152,4 @@ class FilmConstraintValidationTest {
 
         assertTrue(violations.isEmpty(), "Валидация содержит ошибки, которые не ожидались: " + (violations.isEmpty() ? "" : violations.iterator().next().getMessage()));
     }
-
-
 }

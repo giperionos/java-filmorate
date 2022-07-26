@@ -1,14 +1,12 @@
 package ru.yandex.practicum.filmorate.storage.user.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.config.FilmorateConfig;
 import ru.yandex.practicum.filmorate.model.User;
-
 import java.time.LocalDate;
 import java.util.List;
 
@@ -19,14 +17,10 @@ import static org.junit.jupiter.api.Assertions.*;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class UserStorageDbImplTest {
 
-    private  final UserStorageDbImpl userDbStorage;
-    private static User user;
-    private static Long user_id_null = null;
-
-    @BeforeAll
-    public static void beforeAll(){
-        user = new User(user_id_null, "test@test.ru", "login", "name",  LocalDate.parse("14.10.1999", FilmorateConfig.normalDateFormatter));
-    }
+    private final UserStorageDbImpl userDbStorage;
+    private Long user_id_null = null;
+    private User user = new User(user_id_null, "test@test.ru", "login", "name",
+            LocalDate.parse("14.10.1999", FilmorateConfig.NORMAL_DATE_FORMATTER));
 
     @Test
     void testAddUser() {

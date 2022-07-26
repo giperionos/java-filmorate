@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.film.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -9,7 +8,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.config.FilmorateConfig;
 import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.storage.genre.impl.GenreStorageDbImpl;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
@@ -25,34 +23,20 @@ class FilmGenreStorageDbImplTest {
     private final FilmStorageDbImpl filmDbStorage;
     private final GenreStorageDbImpl genreStorage;
 
-    private static Film film;
-    private static Genre comedyGenre;
-    private static Genre cartoonGenre;
+    private Long film1_id = null;
+    private String film1_name = "Matrix";
+    private String film1_description = "Super-Mega Film";
+    private LocalDate film1_releaseDate = LocalDate.parse("14.10.1999", FilmorateConfig.NORMAL_DATE_FORMATTER);
+    private Integer film1_duration = 136;
+    private MpaRating film1_mpa = new MpaRating(4, "R", "Лицам до 17 лет просматривать фильм можно только в присутствии взрослого" );
+    private Set<Genre> film1_genres = null;
+    private Set<Director> film1_directors = null;
 
-    private static Long film1_id = null;
-    private static String film1_name = "Matrix";
-    private static String film1_description = "Super-Mega Film";
-    private static LocalDate film1_releaseDate = LocalDate.parse("14.10.1999", FilmorateConfig.normalDateFormatter);
-    private static Integer film1_duration = 136;
-    private static MPARating film1_mpa = new MPARating(4, "R", "Лицам до 17 лет просматривать фильм можно только в присутствии взрослого" );
-    private static Set<Genre> film1_genres = null;
-    private static Set<Director> film1_directors = null;
+    private Film film = new Film(film1_id, film1_name, film1_description, film1_releaseDate, film1_duration, film1_mpa,
+                film1_genres, film1_directors);
 
-    @BeforeAll
-    public static void init() {
-        film = new Film(
-                film1_id,
-                film1_name,
-                film1_description,
-                film1_releaseDate,
-                film1_duration,
-                film1_mpa,
-                film1_genres,
-                film1_directors);
-
-        comedyGenre = new Genre(1, "Комедия");
-        cartoonGenre = new Genre(3, "Мультфильм");
-    }
+    private Genre comedyGenre = new Genre(1, "Комедия");
+    private Genre cartoonGenre = new Genre(3, "Мультфильм");
 
     @Test
     void testAddFilmGenre() {
@@ -75,7 +59,6 @@ class FilmGenreStorageDbImplTest {
                 new FilmGenre(film.getId(), comedyGenre.getId()),
                 new FilmGenre(film.getId(), cartoonGenre.getId())
         );
-
 
         assertTrue(filmGenresDb.containsAll(filmGenresExpected), "В списке жанров фильма не все жанры.");
     }
@@ -124,7 +107,6 @@ class FilmGenreStorageDbImplTest {
                 new FilmGenre(film.getId(), cartoonGenre.getId())
         );
 
-
         assertTrue(filmGenresDb.containsAll(filmGenresExpected), "В списке жанров фильма не все жанры.");
     }
 
@@ -148,7 +130,6 @@ class FilmGenreStorageDbImplTest {
                 new FilmGenre(film.getId(), comedyGenre.getId()),
                 new FilmGenre(film.getId(), cartoonGenre.getId())
         );
-
 
         assertTrue(filmGenresDb.containsAll(filmGenresExpected), "В списке жанров фильма не все жанры.");
     }

@@ -14,6 +14,7 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 @Service
 @Slf4j
 public class LikeService {
+
     private LikeStorage likeStorage;
     private FilmStorage filmStorage;
     private UserStorage userStorage;

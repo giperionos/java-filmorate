@@ -15,20 +15,6 @@ import java.util.*;
 @ToString
 public class Film {
 
-    public Film(Long id, String name, String description, LocalDate releaseDate, Integer duration, MPARating mpa, Set<Genre> genres, Set<Director> directors) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.releaseDate = releaseDate;
-        this.duration = duration;
-        this.mpa = mpa;
-        this.genres = genres;
-        this.directors = directors;
-    }
-
-    public Film() {
-    }
-
     private Long id;
 
     @NotBlank(message = "Название фильма не должно быть пустым.")
@@ -44,11 +30,22 @@ public class Film {
     private Integer duration;
 
     @NotNull
-    private MPARating mpa;
+    private MpaRating mpa;
 
     private Set<Genre> genres;
 
     private Set<Director> directors;
+
+    public Film(Long id, String name, String description, LocalDate releaseDate, Integer duration, MpaRating mpa, Set<Genre> genres, Set<Director> directors) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+        this.mpa = mpa;
+        this.genres = genres;
+        this.directors = directors;
+    }
 
     @Override
     public boolean equals(Object o) {

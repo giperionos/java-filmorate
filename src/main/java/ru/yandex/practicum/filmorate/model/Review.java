@@ -5,10 +5,8 @@ import lombok.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-@Getter
-@Setter
-@EqualsAndHashCode
-@ToString
+@Data
+@AllArgsConstructor
 public class Review {
 
     private Long reviewId;
@@ -26,17 +24,4 @@ public class Review {
     private Long filmId;
 
     private int useful = 0;
-
-    public Review(Long reviewId, String content, Boolean isPositive,
-                  Long userId,  Long filmId, int useful) {
-        this.reviewId = reviewId;
-        this.content = content;
-        this.isPositive = isPositive;
-        this.userId = userId;
-        this.filmId = filmId;
-        this.useful = useful;
-    }
-
-    public Review() {
-    }
 }
