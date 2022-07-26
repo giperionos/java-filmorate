@@ -51,7 +51,7 @@ public class FilmService {
     public Film addNewFilm(Film film) {
         Film addedFilm = filmStorage.addNewFilm(film);
 
-        //Дозаполнить объект рейтинга MPA в составе объекта Film
+        //Дозаполнить объект рейтинга Mpa в составе объекта Film
         fillMPAForFilm(addedFilm);
 
         //заполнить объекты жанров в составе объекта Film и добавить их БД для данного Film
@@ -68,7 +68,7 @@ public class FilmService {
             //обновить фильм в самой таблице Film
             Film updatedFilm = filmStorage.updateFilm(film);
 
-            //Дозаполнить объект рейтинга MPA в составе объекта Film
+            //Дозаполнить объект рейтинга Mpa в составе объекта Film
             fillMPAForFilm(updatedFilm);
 
             //также нужно обновить жанры
@@ -212,8 +212,8 @@ public class FilmService {
             return;
         }
 
-        //Дозаполнить объект рейтинга MPA в составе объекта Film
-        MPARating mpaRating = ratingStorage.getRatingMpaById(film.getMpa().getId());
+        //Дозаполнить объект рейтинга Mpa в составе объекта Film
+        MpaRating mpaRating = ratingStorage.getRatingMpaById(film.getMpa().getId());
         film.getMpa().setName(mpaRating.getName());
         film.getMpa().setDescription(mpaRating.getDescription());
     }

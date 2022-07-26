@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.friends.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -11,7 +10,6 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.UserFriend;
 import ru.yandex.practicum.filmorate.storage.friend.impl.UserFriendStorageDbImpl;
 import ru.yandex.practicum.filmorate.storage.user.impl.UserStorageDbImpl;
-
 import java.time.LocalDate;
 import java.util.List;
 
@@ -24,28 +22,23 @@ class UserFriendStorageDbImplTest {
 
     private final UserFriendStorageDbImpl userFriendsStorage;
     private final UserStorageDbImpl userDbStorage;
-    private static User userFirst;
-    private static User userSecond;
-    private static User userJohn;
-    private static User userLeo;
-    private static User userNeo;
-    private static User userSmith;
 
-    private static Long user_id_null = null;
-
-    @BeforeAll
-    public static void init(){
-        userFirst = new User(user_id_null, "first@test.ru", "first login", "first name",  LocalDate.parse("14.10.1999", FilmorateConfig.normalDateFormatter));
-        userSecond = new User(user_id_null, "second@test.ru", "second login", "second name",  LocalDate.parse("14.10.1999", FilmorateConfig.normalDateFormatter));
-        userJohn = new User(user_id_null, "John@test.ru", "John login", "John name",  LocalDate.parse("14.10.1999", FilmorateConfig.normalDateFormatter));
-        userLeo = new User(user_id_null, "Leo@test.ru", "Leo login", "Leo name",  LocalDate.parse("14.10.1999", FilmorateConfig.normalDateFormatter));
-        userNeo = new User(user_id_null, "Neo@test.ru", "Neo login", "Neo name",  LocalDate.parse("14.10.1999", FilmorateConfig.normalDateFormatter));
-        userSmith = new User(user_id_null, "Smith@test.ru", "Smith login", "Smith name",  LocalDate.parse("14.10.1999", FilmorateConfig.normalDateFormatter));
-    }
+    private Long user_id_null = null;
+    private User userFirst = new User(user_id_null, "first@test.ru", "first login", "first name",
+            LocalDate.parse("14.10.1999", FilmorateConfig.NORMAL_DATE_FORMATTER));
+    private User userSecond = new User(user_id_null, "second@test.ru", "second login", "second name",
+            LocalDate.parse("14.10.1999", FilmorateConfig.NORMAL_DATE_FORMATTER));
+    private User userJohn = new User(user_id_null, "John@test.ru", "John login", "John name",
+            LocalDate.parse("14.10.1999", FilmorateConfig.NORMAL_DATE_FORMATTER));
+    private User userLeo = new User(user_id_null, "Leo@test.ru", "Leo login", "Leo name",
+            LocalDate.parse("14.10.1999", FilmorateConfig.NORMAL_DATE_FORMATTER));
+    private User userNeo = new User(user_id_null, "Neo@test.ru", "Neo login", "Neo name",
+            LocalDate.parse("14.10.1999", FilmorateConfig.NORMAL_DATE_FORMATTER));
+    private User userSmith = new User(user_id_null, "Smith@test.ru", "Smith login", "Smith name",
+            LocalDate.parse("14.10.1999", FilmorateConfig.NORMAL_DATE_FORMATTER));
 
     @Test
     void testAddUser() {
-
         //Сначала нужно добавить самих пользователей
         userDbStorage.addNewUser(userFirst);
         userDbStorage.addNewUser(userSecond);
@@ -106,7 +99,6 @@ class UserFriendStorageDbImplTest {
 
     @Test
     void getCommonUserFriends() {
-
         //Сначала нужно добавить самих пользователей
         userDbStorage.addNewUser(userJohn);
         userDbStorage.addNewUser(userLeo);

@@ -1,11 +1,13 @@
 package ru.yandex.practicum.filmorate.storage.rating;
 
 
-import ru.yandex.practicum.filmorate.model.MPARating;
+import ru.yandex.practicum.filmorate.model.MpaRating;
 
 import java.util.List;
 
 public interface RatingStorage {
-    MPARating getRatingMpaById(Integer ratingMpaId);
-    List<MPARating> getAllRatingsMpa();
+
+    MpaRating getRatingMpaById(Integer ratingMpaId);
+
+    List<MpaRating> getAllRatingsMpa();
 }

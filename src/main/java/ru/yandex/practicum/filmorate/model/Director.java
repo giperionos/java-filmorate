@@ -7,6 +7,7 @@ import javax.validation.constraints.NotBlank;
 @Data
 @AllArgsConstructor
 public class Director {
+
     private Integer id;
 
     @NotBlank

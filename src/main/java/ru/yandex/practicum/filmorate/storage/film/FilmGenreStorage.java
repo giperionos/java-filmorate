@@ -7,7 +7,10 @@ import java.util.List;
 public interface FilmGenreStorage {
 
     void addNewFilmGenreLink(Long filmId, Integer genreId);
+
     boolean deleteFilmGenreLinksByFilmId(Long filmId);
+
     List<FilmGenre> getFilmGenreLinksByFilmId(Long filmId);
+
     List<FilmGenre> getAllFilmGenreLinks();
 }

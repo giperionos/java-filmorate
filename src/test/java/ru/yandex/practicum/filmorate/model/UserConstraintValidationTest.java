@@ -1,16 +1,11 @@
 package ru.yandex.practicum.filmorate.model;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import ru.yandex.practicum.filmorate.config.FilmorateConfig;
-
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
-
 import java.time.LocalDate;
 import java.util.Set;
 
@@ -18,25 +13,16 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class UserConstraintValidationTest {
 
-    @Autowired
-    private FilmorateConfig properties;
+    private Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
-    private static Validator validator;
-
+    private Long user_id_null = null;
     private User user;
-
-    @BeforeAll
-    public static void beforeAll(){
-        ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
-        validator = validatorFactory.getValidator();
-    }
 
     @BeforeEach
     public void beforeEach(){
-        user = new User(null, "test@test.ru", "login", "name",  LocalDate.parse("14.10.1999", FilmorateConfig.normalDateFormatter));
+        user = new User(user_id_null, "test@test.ru", "login", "name",
+                LocalDate.parse("14.10.1999", FilmorateConfig.NORMAL_DATE_FORMATTER));
     }
-
-    //Test EMail
 
     @Test
     public void shouldBeEmptyValidationErrorsWhenEmailIsCorrect(){
@@ -66,8 +52,6 @@ class UserConstraintValidationTest {
         assertEquals("Указанный email пользователя не сооветствует формату email.", violations.iterator().next().getMessage());
     }
 
-    //Test login
-
     @Test
     public void shouldBeEmptyValidationErrorsWhenLoginIsCorrect(){
 
@@ -96,8 +80,6 @@ class UserConstraintValidationTest {
         assertEquals("Указанный login пользователя содержит пробелы.", violations.iterator().next().getMessage());
     }
 
-    //Test birthday
-
     @Test
     public void shouldExistValidationErrorsWhenBirthdayDateInFuture(){
 
@@ -125,5 +107,4 @@ class UserConstraintValidationTest {
 
         assertTrue(violations.isEmpty(), "Валидация содержит ошибки, которые не ожидались: " + (violations.isEmpty() ? "" : violations.iterator().next().getMessage()));
     }
-
 }

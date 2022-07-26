@@ -13,6 +13,7 @@ import java.util.Collection;
 public class EventStorageDbImpl implements EventStorage {
 
     private final JdbcTemplate jdbcTemplate;
+
     @Autowired
     public EventStorageDbImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
