@@ -13,21 +13,9 @@ import java.util.*;
 @Getter
 @Setter
 @ToString
-public class Film extends Entity {
+public class Film {
 
-    public Film(Long id, String name, String description, LocalDate releaseDate, Integer duration, MPARating mpa, Set<Genre> genres) {
-        super(id);
-        this.name = name;
-        this.description = description;
-        this.releaseDate = releaseDate;
-        this.duration = duration;
-        this.mpa = mpa;
-        this.genres = genres;
-    }
-
-    public Film() {
-        super(null);
-    }
+    private Long id;
 
     @NotBlank(message = "Название фильма не должно быть пустым.")
     private String name;
@@ -41,20 +29,31 @@ public class Film extends Entity {
     @Positive(message = "Продолжительность фильма должна быть положительной.")
     private Integer duration;
 
-    //оставлено для работоспособности InMemory-реализации
-    private Set<Long> likes;
-
     @NotNull
-    private MPARating mpa;
+    private MpaRating mpa;
 
     private Set<Genre> genres;
+
+    private Set<Director> directors;
+
+    public Film(Long id, String name, String description, LocalDate releaseDate, Integer duration, MpaRating mpa, Set<Genre> genres, Set<Director> directors) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+        this.mpa = mpa;
+        this.genres = genres;
+        this.directors = directors;
+    }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Film film = (Film) o;
-        return name.equals(film.name)
+        return id.longValue() == film.getId().longValue()
+                && name.equals(film.name)
                 && description.equals(film.description)
                 && releaseDate.equals(film.releaseDate)
                 && duration.longValue() == film.duration.longValue()
@@ -63,6 +62,6 @@ public class Film extends Entity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, releaseDate, duration, likes, mpa.getId());
+        return Objects.hash(id.longValue(), name, description, releaseDate, duration, mpa.getId().intValue());
     }
 }

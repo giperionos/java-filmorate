@@ -6,8 +6,11 @@ import java.util.List;
 
 public interface FilmGenreStorage {
 
-    void add(Long filmId, Integer genreId);
-    boolean deleteByFilmId(Long id);
-    List<FilmGenre> getByFilmId(Long id);
-    List<FilmGenre> getAll();
+    void addNewFilmGenreLink(Long filmId, Integer genreId);
+
+    boolean deleteFilmGenreLinksByFilmId(Long filmId);
+
+    List<FilmGenre> getFilmGenreLinksByFilmId(Long filmId);
+
+    List<FilmGenre> getAllFilmGenreLinks();
 }

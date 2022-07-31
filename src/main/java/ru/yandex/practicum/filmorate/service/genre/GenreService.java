@@ -9,6 +9,7 @@ import java.util.List;
 
 @Service
 public class GenreService {
+
     private GenreStorage genreStorage;
 
     @Autowired
@@ -16,11 +17,11 @@ public class GenreService {
         this.genreStorage = genreStorage;
     }
 
-    public Genre getById(Integer id){
-        return genreStorage.getById(id);
+    public Genre getGenreById(Integer genreId){
+        return genreStorage.getGenreById(genreId);
     }
 
-    public List<Genre> getAll(){
-        return genreStorage.getAll();
+    public List<Genre> getAllGenres(){
+        return genreStorage.getAllGenres();
     }
 }

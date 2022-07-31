@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service.user;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -12,38 +13,44 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import java.util.List;
 
 @Service
+@Slf4j
 public class UserService {
 
     private final UserStorage userStorage;
     private final UserFriendStorage userFriendStorage;
 
     @Autowired
-    public UserService(@Qualifier("userDbStorage")UserStorage userStorage, UserFriendStorage userFriendStorage) {
+    public UserService(@Qualifier("userStorageDbImpl")UserStorage userStorage, UserFriendStorage userFriendStorage) {
         this.userStorage = userStorage;
         this.userFriendStorage = userFriendStorage;
     }
 
-    public User add(User user) {
-        return userStorage.add(user);
+    public User addNewUser(User user) {
+        return userStorage.addNewUser(user);
     }
 
-    public User update(User user) {
+    public User updateUser(User user) {
         try {
-            return userStorage.update(user);
-        } catch (EntityNotFoundException exception) {
-            throw new UnknownUserException(String.format("Фильм с %d не найден в хранилище.", user.getId()));
+            return userStorage.updateUser(user);
+        } catch (UnknownUserException exception) {
+            log.warn(String.format("Фильм с %d не найден в хранилище.", user.getId()));
+            throw exception;
         }
     }
 
-    public List<User> getAll() {
-        return userStorage.getAll();
+    public List<User> getAllUsers() {
+        return userStorage.getAllUsers();
     }
 
-    public User getUserById(Long id) {
-        User foundedUser = userStorage.getById(id);
+    public User getUserById(Long userId) {
 
-        if (foundedUser == null) {
-            throw new EntityNotFoundException(String.format("Пользователь с %d не найден в хранилище.", id));
+        User foundedUser;
+
+        try {
+            foundedUser = userStorage.getUserById(userId);
+        } catch (UnknownUserException e) {
+            log.warn("Пришел неизвестный пользователь с userId = " + userId);
+            throw e;
         }
 
         return foundedUser;
@@ -51,60 +58,62 @@ public class UserService {
 
     public void addToFriends(Long userId, Long friendId) {
 
-        //Дружба должна стать односторонней.
-        //Это значит, что если какой-то пользователь оставил вам заявку в друзья,
-        //то он будет в списке ваших друзей, а вы в его — нет
-
-        //сначала найден этих пользователей
-        User user = userStorage.getById(userId);
-        User friend = userStorage.getById(friendId);
-
-        //ошибка - если таких пользователей нет
-        if (user == null) {
-            throw new EntityNotFoundException(String.format("Пользователь с %d не найден в хранилище.", userId));
+        try {
+            userStorage.getUserById(userId);
+        } catch (UnknownUserException e) {
+            log.warn("Пришел неизвестный пользователь с userId = " + userId);
+            throw e;
         }
 
-        if (friend == null) {
-            throw new EntityNotFoundException(String.format("Пользователь с %d не найден в хранилище.", friendId));
+        try {
+            userStorage.getUserById(friendId);
+        } catch (UnknownUserException e) {
+            log.warn("Пришел неизвестный пользователь с userId = " + friendId);
+            throw e;
         }
 
         //добавить user-у в друзья пользователя с friendId
-        userFriendStorage.add(userId, friendId);
+        userFriendStorage.addNewUserFriendLink(userId, friendId);
     }
 
     public void removeFromFriends(Long userId, Long friendId) {
         //удалить из друзей нужно их обоих друг у друга
 
-        //сначала найден этих пользователей
-        User user = userStorage.getById(userId);
-        User friend = userStorage.getById(friendId);
-
-        //ошибка - если таких пользователей нет
-        if (user == null) {
-            throw new EntityNotFoundException(String.format("Пользователь с %d не найден в хранилище.", userId));
+        try {
+            userStorage.getUserById(userId);
+        } catch (UnknownUserException e) {
+            log.warn("Пришел неизвестный пользователь с userId = " + userId);
+            throw e;
         }
 
-        if (friend == null) {
-            throw new EntityNotFoundException(String.format("Пользователь с %d не найден в хранилище.", friendId));
+        try {
+            userStorage.getUserById(friendId);
+        } catch (UnknownUserException e) {
+            log.warn("Пришел неизвестный пользователь с userId = " + friendId);
+            throw e;
         }
 
         //удалить у user-а из друзей пользователя с friendId
-        userFriendStorage.remove(userId, friendId);
+        userFriendStorage.removeUserFriendLinkByUserIdAndFriendId(userId, friendId);
     }
 
-    public List<User> getAllUserFriends(Long id) {
-        User foundedUser = userStorage.getById(id);
+    public List<User> getAllUserFriendsByUserId(Long userId) {
+        User foundedUser = userStorage.getUserById(userId);
 
         if (foundedUser == null) {
-            throw new EntityNotFoundException(String.format("Пользователь с %d не найден в хранилище.", id));
+            throw new EntityNotFoundException(String.format("Пользователь с %d не найден в хранилище.", userId));
         }
 
         //вернуть список всех друзей пользователя
         return userFriendStorage.getAllFriendsByOwnerUserId(foundedUser.getId());
     }
 
-    public List<User> getCommonUserFriends(Long id, Long otherId) {
+    public List<User> getCommonUserFriends(Long userId, Long otherId) {
         //список друзей, общих с другим пользователем
-        return userFriendStorage.getCommonUserFriends(id,otherId);
+        return userFriendStorage.getCommonUserFriends(userId,otherId);
+    }
+
+    public void removeUserById(Long userId) {
+        userStorage.deleteUserById(userId);
     }
 }

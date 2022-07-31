@@ -4,23 +4,14 @@ import lombok.*;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
 
 @Getter
 @Setter
 @EqualsAndHashCode
 @ToString
-public class User extends Entity {
+public class User {
 
-    public User(Long id, String email, String login, String name, LocalDate birthday) {
-        super(id);
-        this.email = email;
-        this.login = login;
-        this.name = name;
-        this.birthday = birthday;
-        defineName();
-    }
+    private Long id;
 
     @NotNull(message = "Не указан email пользователя.")
     @Email(message = "Указанный email пользователя не сооветствует формату email.")
@@ -34,6 +25,15 @@ public class User extends Entity {
 
     @Past(message = "Дата рождения пользователя должна быть в прошлом.")
     private LocalDate birthday;
+
+    public User(Long id, String email, String login, String name, LocalDate birthday) {
+        this.id = id;
+        this.email = email;
+        this.login = login;
+        this.name = name;
+        this.birthday = birthday;
+        defineName();
+    }
 
     private void defineName(){
         if (this.getName().isEmpty() || this.getName().isBlank()) {

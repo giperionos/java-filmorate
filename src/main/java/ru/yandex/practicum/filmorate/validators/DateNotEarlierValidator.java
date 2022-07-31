@@ -17,7 +17,7 @@ public class DateNotEarlierValidator implements ConstraintValidator<DateNotEarli
 
     @Override
     public boolean isValid(LocalDate localDate, ConstraintValidatorContext constraintValidatorContext) {
-        return localDate.isAfter(LocalDate.parse(startDateString, FilmorateConfig.normalDateFormatter).minusDays(1));
+        return localDate.isAfter(LocalDate.parse(startDateString, FilmorateConfig.NORMAL_DATE_FORMATTER).minusDays(1));
     }
 
 }
